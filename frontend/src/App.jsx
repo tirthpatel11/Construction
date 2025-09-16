@@ -8,7 +8,9 @@ function App() {
   const [apiStatus, setApiStatus] = useState('pending')
 
   useEffect(() => {
-    fetch('/api/health/')
+    const base = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
+    const url = `${base}/api/health/`
+    fetch(url)
       .then((r) => r.json())
       .then(() => setApiStatus('ok'))
       .catch(() => setApiStatus('error'))
