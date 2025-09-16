@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
-{% block title %}Create Project - SiteSphere{% endblock %}
+{% block title %}{% if is_edit %}Edit Project - SiteSphere{% else %}Create Project - SiteSphere{% endif %}{% endblock %}
 
-{% block page_title %}Create New Project{% endblock %}
+{% block page_title %}{% if is_edit %}Edit Project{% else %}Create New Project{% endif %}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -57,9 +57,9 @@
                     
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="{{ project_form.estimated_budget.id_for_label }}" class="form-label fw-semibold">Estimated Budget ($) *</label>
+                            <label for="{{ project_form.estimated_budget.id_for_label }}" class="form-label fw-semibold">Estimated Budget (₹) *</label>
                             <div class="input-group">
-                                <span class="input-group-text">$</span>
+                                <span class="input-group-text">₹</span>
                                 {{ project_form.estimated_budget }}
                             </div>
                         </div>
@@ -150,7 +150,7 @@
                 <div class="card-body text-center">
                     <button type="submit" class="btn btn-primary btn-lg px-5 me-3">
                         <i class="fas fa-save me-2"></i>
-                        Create Project
+                        {% if is_edit %}Update Project{% else %}Create Project{% endif %}
                     </button>
                     <a href="{% url 'dashboard:project_selection' %}" class="btn btn-outline-secondary btn-lg px-5">
                         <i class="fas fa-times me-2"></i>
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Update form indices
             const formRegex = new RegExp('partners-0-', 'g');
-            newForm.innerHTML = newForm.innerHTML.replace(formRegex, `partners-${partnerCount}-`);
+            newForm.innerHTML = newForm.innerHTML.replace(formRegex, `partners-₹{partnerCount}-`);
             
             // Clear form values
             const inputs = newForm.querySelectorAll('input, textarea, select');
@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Update partner number
             const partnerHeader = newForm.querySelector('h6');
-            partnerHeader.innerHTML = `<i class="fas fa-user me-2"></i>Partner ${partnerCount + 1}`;
+            partnerHeader.innerHTML = `<i class="fas fa-user me-2"></i>Partner ₹{partnerCount + 1}`;
             
             // Add remove button if it doesn't exist
             const removeBtn = newForm.querySelector('.remove-partner');
@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const partnerForms = document.querySelectorAll('.partner-form');
         partnerForms.forEach((form, index) => {
             const header = form.querySelector('h6');
-            header.innerHTML = `<i class="fas fa-user me-2"></i>Partner ${index + 1}`;
+            header.innerHTML = `<i class="fas fa-user me-2"></i>Partner ₹{index + 1}`;
         });
     }
     

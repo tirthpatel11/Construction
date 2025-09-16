@@ -60,17 +60,17 @@
                             <tr>
                                 <td>{{ control.category }}</td>
                                 <td>{{ control.description }}</td>
-                                <td>${{ control.budget_amount|floatformat:2 }}</td>
-                                <td>${{ control.estimate_amount|floatformat:2 }}</td>
-                                <td>${{ control.actual_amount|floatformat:2 }}</td>
+                                <td>₹{{ control.budget_amount|floatformat:2 }}</td>
+                                <td>₹{{ control.estimate_amount|floatformat:2 }}</td>
+                                <td>₹{{ control.actual_amount|floatformat:2 }}</td>
                                 <td class="{% if control.budget_vs_estimate_variance < 0 %}text-danger{% else %}text-success{% endif %}">
-                                    ${{ control.budget_vs_estimate_variance|floatformat:2 }}
+                                    ₹{{ control.budget_vs_estimate_variance|floatformat:2 }}
                                 </td>
                                 <td class="{% if control.estimate_vs_actual_variance < 0 %}text-danger{% else %}text-success{% endif %}">
-                                    ${{ control.estimate_vs_actual_variance|floatformat:2 }}
+                                    ₹{{ control.estimate_vs_actual_variance|floatformat:2 }}
                                 </td>
                                 <td class="{% if control.budget_vs_actual_variance < 0 %}text-danger{% else %}text-success{% endif %}">
-                                    ${{ control.budget_vs_actual_variance|floatformat:2 }}
+                                    ₹{{ control.budget_vs_actual_variance|floatformat:2 }}
                                 </td>
                             </tr>
                             {% endfor %}

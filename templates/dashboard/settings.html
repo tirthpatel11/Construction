@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Settings - SiteSphere{% endblock %}
+{% block page_title %}Settings{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="fas fa-cog me-2 text-primary"></i>Preferences</h5>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Theme</label>
+            <select class="form-select" name="theme">
+              <option value="light" {% if theme == 'light' %}selected{% endif %}>Light</option>
+              <option value="dark" {% if theme == 'dark' %}selected{% endif %}>Dark</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Currency</label>
+            <select class="form-select" name="currency">
+              <option value="INR" {% if currency == 'INR' %}selected{% endif %}>Indian Rupee (₹)</option>
+              <option value="USD" {% if currency == 'USD' %}selected{% endif %}>US Dollar ($)</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Save</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+
+
+

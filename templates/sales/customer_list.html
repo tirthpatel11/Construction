@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Customers - SiteSphere{% endblock %}
+
+{% block page_title %}Customers{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card dashboard-widget">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-users me-2 text-primary"></i>
+                    Customers
+                </h5>
+                <a href="{% url 'sales:customer_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add Customer
+                </a>
+            </div>
+            <div class="card-body">
+                {% if customers %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Customer ID</th>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>City</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for customer in customers %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-primary">#{{ customer.id }}</span>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>{{ customer.first_name }} {{ customer.last_name }}</strong>
+                                            {% if customer.company_name %}
+                                                <br>
+                                                <small class="text-muted">{{ customer.company_name }}</small>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{% if customer.customer_type == 'individual' %}info{% else %}warning{% endif %}">
+                                            {{ customer.get_customer_type_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ customer.email }}</td>
+                                    <td>{{ customer.phone }}</td>
+                                    <td>{{ customer.city }}</td>
+                                    <td>
+                                        <span class="badge bg-success">Active</span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'sales:customer_detail' customer.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'sales:customer_edit' customer.id %}" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No customers found</h5>
+                        <p class="text-muted">Start by adding your first customer.</p>
+                        <a href="{% url 'sales:customer_create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Add First Customer
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

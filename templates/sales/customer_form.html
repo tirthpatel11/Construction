@@ -1,0 +1,364 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Customer - SiteSphere{% endblock %}
+
+{% block page_title %}{% if customer %}Edit Customer{% else %}Add New Customer{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-user me-2 text-primary"></i>
+                    Customer Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.customer_type.id_for_label }}" class="form-label">Customer Type</label>
+                            {{ form.customer_type }}
+                            {% if form.customer_type.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.customer_type.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.company_name.id_for_label }}" class="form-label">Company Name</label>
+                            {{ form.company_name }}
+                            {% if form.company_name.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.company_name.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.first_name.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.last_name.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.email.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.phone.id_for_label }}" class="form-label">Phone</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.phone.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.alternate_phone.id_for_label }}" class="form-label">Alternate Phone</label>
+                            {{ form.alternate_phone }}
+                            {% if form.alternate_phone.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.alternate_phone.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.date_of_birth.id_for_label }}" class="form-label">Date of Birth</label>
+                            {{ form.date_of_birth }}
+                            {% if form.date_of_birth.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.date_of_birth.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.address.id_for_label }}" class="form-label">Address</label>
+                        {{ form.address }}
+                        {% if form.address.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.address.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.city.id_for_label }}" class="form-label">City</label>
+                            {{ form.city }}
+                            {% if form.city.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.city.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.state.id_for_label }}" class="form-label">State</label>
+                            {{ form.state }}
+                            {% if form.state.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.state.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.pincode.id_for_label }}" class="form-label">Pincode</label>
+                            {{ form.pincode }}
+                            {% if form.pincode.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.pincode.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.pan_number.id_for_label }}" class="form-label">PAN Number</label>
+                            {{ form.pan_number }}
+                            {% if form.pan_number.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.pan_number.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.aadhar_number.id_for_label }}" class="form-label">Aadhar Number</label>
+                            {{ form.aadhar_number }}
+                            {% if form.aadhar_number.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.aadhar_number.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.gst_number.id_for_label }}" class="form-label">GST Number</label>
+                            {{ form.gst_number }}
+                            {% if form.gst_number.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.gst_number.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.occupation.id_for_label }}" class="form-label">Occupation</label>
+                            {{ form.occupation }}
+                            {% if form.occupation.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.occupation.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.annual_income.id_for_label }}" class="form-label">Annual Income</label>
+                            {{ form.annual_income }}
+                            {% if form.annual_income.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.annual_income.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'sales:customer_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Customers
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>{% if customer %}Update Customer{% else %}Create Customer{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Show/hide company name field based on customer type
+    const customerTypeSelect = document.getElementById('id_customer_type');
+    const companyNameField = document.getElementById('id_company_name').closest('.col-md-6');
+    
+    if (customerTypeSelect && companyNameField) {
+        function toggleCompanyField() {
+            if (customerTypeSelect.value === 'company') {
+                companyNameField.style.display = 'block';
+                document.getElementById('id_company_name').required = true;
+            } else {
+                companyNameField.style.display = 'none';
+                document.getElementById('id_company_name').required = false;
+                document.getElementById('id_company_name').value = '';
+            }
+        }
+        
+        customerTypeSelect.addEventListener('change', toggleCompanyField);
+        toggleCompanyField(); // Initial call
+    }
+    
+    // Phone number formatting
+    const phoneInput = document.getElementById('id_phone');
+    const altPhoneInput = document.getElementById('id_alternate_phone');
+    
+    function formatPhoneNumber(input) {
+        let value = input.value.replace(/\D/g, '');
+        if (value.length >= 10) {
+            value = value.substring(0, 10);
+            value = value.replace(/(\d{3})(\d{3})(\d{4})/, '(₹1) ₹2-₹3');
+        }
+        input.value = value;
+    }
+    
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function() {
+            formatPhoneNumber(this);
+        });
+    }
+    
+    if (altPhoneInput) {
+        altPhoneInput.addEventListener('input', function() {
+            formatPhoneNumber(this);
+        });
+    }
+    
+    // PAN number validation
+    const panInput = document.getElementById('id_pan_number');
+    if (panInput) {
+        panInput.addEventListener('input', function() {
+            let value = this.value.toUpperCase();
+            // PAN format: 5 letters, 4 numbers, 1 letter
+            value = value.replace(/[^A-Z0-9]/g, '');
+            if (value.length > 10) {
+                value = value.substring(0, 10);
+            }
+            this.value = value;
+        });
+    }
+    
+    // Aadhar number validation
+    const aadharInput = document.getElementById('id_aadhar_number');
+    if (aadharInput) {
+        aadharInput.addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 12) {
+                value = value.substring(0, 12);
+            }
+            this.value = value;
+        });
+    }
+    
+    // Form validation
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const requiredFields = ['id_customer_type', 'id_first_name', 'id_last_name', 'id_email', 'id_phone', 'id_address', 'id_city', 'id_state', 'id_pincode'];
+            let isValid = true;
+            
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field && !field.value.trim()) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                } else if (field) {
+                    field.classList.remove('is-invalid');
+                }
+            });
+            
+            // Check if company name is required
+            if (customerTypeSelect && customerTypeSelect.value === 'company') {
+                const companyNameField = document.getElementById('id_company_name');
+                if (!companyNameField.value.trim()) {
+                    companyNameField.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    companyNameField.classList.remove('is-invalid');
+                }
+            }
+            
+            if (!isValid) {
+                e.preventDefault();
+                alert('Please fill in all required fields.');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,2 +1,46 @@
+# Python/Django
+__pycache__/
+*.py[cod]
+*.sqlite3
+db.sqlite3
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+ENV/
+pip-wheel-metadata/
+
+# Django static/media
+staticfiles/
+media/
+
+# Env files
+.env
+.env.*
+!*.example
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Node/Frontend
+node_modules/
+frontend/node_modules/
+frontend/.vite/
+frontend/.eslintcache
+
+# MacOS
+.DS_Store
+
+# Vercel/Build
+.vercel
+.cache/
+**/.vercel/cache
 node_modules/
 .env

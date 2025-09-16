@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ customer.first_name }} {{ customer.last_name }} - SiteSphere{% endblock %}
+
+{% block page_title %}Customer Details{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card dashboard-widget">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-user me-2 text-primary"></i>
+                    Customer Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Personal Details</h6>
+                        <p><strong>Name:</strong> {{ customer.first_name }} {{ customer.last_name }}</p>
+                        <p><strong>Email:</strong> {{ customer.email }}</p>
+                        <p><strong>Phone:</strong> {{ customer.phone }}</p>
+                        {% if customer.alternate_phone %}
+                            <p><strong>Alternate Phone:</strong> {{ customer.alternate_phone }}</p>
+                        {% endif %}
+                        <p><strong>Type:</strong> {{ customer.get_customer_type_display }}</p>
+                        {% if customer.company_name %}
+                            <p><strong>Company:</strong> {{ customer.company_name }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Address Details</h6>
+                        <p><strong>Address:</strong> {{ customer.address }}</p>
+                        <p><strong>City:</strong> {{ customer.city }}</p>
+                        <p><strong>State:</strong> {{ customer.state }}</p>
+                        <p><strong>Pincode:</strong> {{ customer.pincode }}</p>
+                        <p><strong>Country:</strong> {{ customer.country }}</p>
+                    </div>
+                </div>
+                
+                {% if customer.date_of_birth or customer.pan_number or customer.aadhar_number or customer.gst_number %}
+                <hr>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Identity Details</h6>
+                        {% if customer.date_of_birth %}
+                            <p><strong>Date of Birth:</strong> {{ customer.date_of_birth|date:"M d, Y" }}</p>
+                        {% endif %}
+                        {% if customer.pan_number %}
+                            <p><strong>PAN:</strong> {{ customer.pan_number }}</p>
+                        {% endif %}
+                        {% if customer.aadhar_number %}
+                            <p><strong>Aadhar:</strong> {{ customer.aadhar_number }}</p>
+                        {% endif %}
+                        {% if customer.gst_number %}
+                            <p><strong>GST:</strong> {{ customer.gst_number }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Additional Information</h6>
+                        {% if customer.occupation %}
+                            <p><strong>Occupation:</strong> {{ customer.occupation }}</p>
+                        {% endif %}
+                        {% if customer.annual_income %}
+                            <p><strong>Annual Income:</strong> ₹{{ customer.annual_income|floatformat:0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card dashboard-widget">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-handshake me-2 text-primary"></i>
+                    Recent Bookings
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if bookings %}
+                    <div class="list-group list-group-flush">
+                        {% for booking in bookings %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Booking #{{ booking.id }}</h6>
+                                <small class="text-muted">{{ booking.unit.unit_number }} - {{ booking.unit.building.name }}</small>
+                                <br>
+                                <small class="text-muted">{{ booking.booking_date|date:"M d, Y" }}</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="fw-bold">₹{{ booking.agreement_value|floatformat:0 }}</span>
+                                <br>
+                                <span class="badge bg-{% if booking.status == 'active' %}success{% elif booking.status == 'cancelled' %}danger{% else %}warning{% endif %}">
+                                    {{ booking.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center">No bookings found</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card dashboard-widget mt-3">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-credit-card me-2 text-primary"></i>
+                    Payment Summary
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h4 class="text-primary">₹{{ total_payments|floatformat:0 }}</h4>
+                        <small class="text-muted">Total Paid</small>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="text-warning">₹{{ pending_amount|floatformat:0 }}</h4>
+                        <small class="text-muted">Pending</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'sales:customer_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Customers
+            </a>
+            <div>
+                <a href="{% url 'sales:customer_edit' customer.id %}" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-edit me-2"></i>Edit Customer
+                </a>
+                <a href="{% url 'sales:booking_create' %}?customer={{ customer.id }}" class="btn btn-success">
+                    <i class="fas fa-plus me-2"></i>New Booking
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

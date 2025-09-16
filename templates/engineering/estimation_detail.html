@@ -57,15 +57,15 @@
                                 <td>{{ item.description }}</td>
                                 <td>{{ item.unit }}</td>
                                 <td>{{ item.quantity }}</td>
-                                <td>${{ item.unit_rate|floatformat:2 }}</td>
-                                <td class="fw-bold">${{ item.total_amount|floatformat:2 }}</td>
+                                <td>₹{{ item.unit_rate|floatformat:2 }}</td>
+                                <td class="fw-bold">₹{{ item.total_amount|floatformat:2 }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                         <tfoot>
                             <tr class="table-primary">
                                 <th colspan="5">Total Estimated Cost</th>
-                                <th class="fw-bold">${{ estimation.total_estimated_cost|floatformat:2 }}</th>
+                                <th class="fw-bold">₹{{ estimation.total_estimated_cost|floatformat:2 }}</th>
                             </tr>
                         </tfoot>
                     </table>

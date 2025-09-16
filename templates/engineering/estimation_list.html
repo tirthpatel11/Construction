@@ -40,7 +40,7 @@
                                 <td>{{ estimation.name }}</td>
                                 <td>{{ estimation.project.name }}</td>
                                 <td>{{ estimation.version }}</td>
-                                <td>${{ estimation.total_estimated_cost|floatformat:2 }}</td>
+                                <td>₹{{ estimation.total_estimated_cost|floatformat:2 }}</td>
                                 <td>{{ estimation.created_at|date:"M d, Y" }}</td>
                                 <td>
                                     <a href="{% url 'engineering:estimation_detail' estimation.id %}" class="btn btn-sm btn-outline-primary">View</a>

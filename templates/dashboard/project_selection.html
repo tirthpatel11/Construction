@@ -90,9 +90,9 @@
                                 </td>
                                 <td>
                                     <div>
-                                        <strong>${{ project.estimated_budget|floatformat:0 }}</strong>
+                                        <strong>₹{{ project.estimated_budget|floatformat:0 }}</strong>
                                         {% if project.actual_cost > 0 %}
-                                        <br><small class="text-muted">Spent: ${{ project.actual_cost|floatformat:0 }}</small>
+                                        <br><small class="text-muted">Spent: ₹{{ project.actual_cost|floatformat:0 }}</small>
                                         {% endif %}
                                     </div>
                                 </td>

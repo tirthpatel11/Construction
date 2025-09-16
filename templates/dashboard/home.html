@@ -4,42 +4,291 @@
 
 {% block page_title %}Dashboard{% endblock %}
 
+{% block extra_css %}
+<style>
+    .dashboard-widget {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .dashboard-widget:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+    
+    .stat-card-modern {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 20px;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card-modern::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: scale(0);
+        transition: transform 0.6s ease;
+    }
+    
+    .stat-card-modern:hover::before {
+        transform: scale(1);
+    }
+    
+    .stat-card-success {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+    
+    .stat-card-warning {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .stat-card-danger {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .chart-container-modern {
+        position: relative;
+        height: 350px;
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+    
+    .metric-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border-left: 4px solid var(--primary-color);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .metric-card.success {
+        border-left-color: var(--success-color);
+    }
+    
+    .metric-card.warning {
+        border-left-color: var(--warning-color);
+    }
+    
+    .metric-card.danger {
+        border-left-color: var(--danger-color);
+    }
+    
+    .progress-modern {
+        height: 12px;
+        border-radius: 20px;
+        background: linear-gradient(90deg, #e2e8f0 0%, #f1f5f9 100%);
+        overflow: hidden;
+    }
+    
+    .progress-bar-modern {
+        background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+        border-radius: 20px;
+        transition: width 0.8s ease;
+    }
+    
+    .activity-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border-radius: 12px;
+        margin-bottom: 0.5rem;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .activity-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 1.2rem;
+    }
+    
+    .activity-icon.primary {
+        background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+        color: white;
+    }
+    
+    .activity-icon.success {
+        background: linear-gradient(135deg, var(--success-color), #059669);
+        color: white;
+    }
+    
+    .activity-icon.warning {
+        background: linear-gradient(135deg, var(--warning-color), #d97706);
+        color: white;
+    }
+    
+    .heatmap-modern {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+    
+    .loading-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .chart-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .chart-controls {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .chart-control-btn {
+        padding: 0.5rem 1rem;
+        border: 1px solid #e2e8f0;
+        background: white;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.875rem;
+    }
+    
+    .chart-control-btn:hover,
+    .chart-control-btn.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
+<!-- Welcome Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="dashboard-widget">
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="mb-2">Welcome back, {{ user.first_name|default:user.username }}! 👋</h3>
+                        <p class="text-muted mb-0">Here's what's happening with your construction projects today.</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-primary btn-sm" onclick="refreshDashboard()">
+                            <i class="fas fa-sync-alt me-1"></i> Refresh
+                        </button>
+                        <button class="btn btn-primary btn-sm" onclick="exportDashboard()">
+                            <i class="fas fa-download me-1"></i> Export
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Statistics Cards -->
 <div class="row mb-4">
-    <div class="col-md-3 mb-3">
-        <div class="card stat-card">
-            <div class="card-body text-center">
-                <i class="fas fa-project-diagram fa-2x mb-2"></i>
-                <h3 class="mb-1">{{ total_projects }}</h3>
-                <p class="mb-0">Total Projects</p>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stat-card-modern">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h2 class="mb-1">{{ total_projects }}</h2>
+                    <p class="mb-0 opacity-75">Total Projects</p>
+                    <small class="opacity-75">
+                        <i class="fas fa-arrow-up me-1"></i>
+                        +{{ completed_projects }} completed
+                    </small>
+                </div>
+                <div class="fs-1 opacity-25">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3 mb-3">
-        <div class="card stat-card success">
-            <div class="card-body text-center">
-                <i class="fas fa-play-circle fa-2x mb-2"></i>
-                <h3 class="mb-1">{{ active_projects }}</h3>
-                <p class="mb-0">Active Projects</p>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stat-card-modern stat-card-success">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h2 class="mb-1">{{ active_projects }}</h2>
+                    <p class="mb-0 opacity-75">Active Projects</p>
+                    <small class="opacity-75">
+                        <i class="fas fa-clock me-1"></i>
+                        In progress
+                    </small>
+                </div>
+                <div class="fs-1 opacity-25">
+                    <i class="fas fa-play-circle"></i>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3 mb-3">
-        <div class="card stat-card warning">
-            <div class="card-body text-center">
-                <i class="fas fa-dollar-sign fa-2x mb-2"></i>
-                <h3 class="mb-1">${{ total_budget|floatformat:0 }}</h3>
-                <p class="mb-0">Total Budget</p>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stat-card-modern stat-card-warning">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h2 class="mb-1">₹{{ total_budget|floatformat:0 }}</h2>
+                    <p class="mb-0 opacity-75">Total Budget</p>
+                    <small class="opacity-75">
+                        <i class="fas fa-indian-rupee-sign me-1"></i>
+                        Across all projects
+                    </small>
+                </div>
+                <div class="fs-1 opacity-25">
+                    <i class="fas fa-wallet"></i>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3 mb-3">
-        <div class="card stat-card danger">
-            <div class="card-body text-center">
-                <i class="fas fa-chart-line fa-2x mb-2"></i>
-                <h3 class="mb-1">{{ budget_utilization|floatformat:1 }}%</h3>
-                <p class="mb-0">Budget Used</p>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stat-card-modern stat-card-danger">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h2 class="mb-1">{{ budget_utilization|floatformat:1 }}%</h2>
+                    <p class="mb-0 opacity-75">Budget Used</p>
+                    <small class="opacity-75">
+                        <i class="fas fa-chart-pie me-1"></i>
+                        ₹{{ total_spent|floatformat:0 }} spent
+                    </small>
+                </div>
+                <div class="fs-1 opacity-25">
+                    <i class="fas fa-chart-line"></i>
+                </div>
             </div>
         </div>
     </div>
@@ -48,34 +297,70 @@
 <!-- Charts Row -->
 <div class="row mb-4">
     <!-- Cash Flow Chart -->
-    <div class="col-md-8 mb-3">
-        <div class="card">
-            <div class="card-header bg-white">
-                <h5 class="mb-0">
-                    <i class="fas fa-chart-line me-2 text-primary"></i>
-                    Cash Flow Analysis
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="chart-container">
-                    <canvas id="cashFlowChart"></canvas>
+    <div class="col-lg-8 mb-4">
+        <div class="dashboard-widget">
+            <div class="chart-toolbar">
+                <div>
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line me-2 text-primary"></i>
+                        Cash Flow Analysis
+                    </h5>
+                    <small class="text-muted">Income vs Expenses over the last 6 months</small>
                 </div>
+                <div class="chart-controls">
+                    <button class="chart-control-btn active" data-period="6m">6M</button>
+                    <button class="chart-control-btn" data-period="1y">1Y</button>
+                    <button class="chart-control-btn" data-period="all">All</button>
+                </div>
+            </div>
+            <div class="chart-container-modern">
+                <canvas id="cashFlowChart"></canvas>
             </div>
         </div>
     </div>
     
-    <!-- Cost Breakdown Donut Chart -->
-    <div class="col-md-4 mb-3">
-        <div class="card">
-            <div class="card-header bg-white">
+    <!-- Cost Breakdown & Budget Utilization -->
+    <div class="col-lg-4 mb-4">
+        <div class="dashboard-widget">
+            <div class="chart-toolbar">
                 <h5 class="mb-0">
                     <i class="fas fa-chart-pie me-2 text-primary"></i>
                     Cost Breakdown
                 </h5>
             </div>
-            <div class="card-body">
-                <div class="chart-container">
-                    <canvas id="costBreakdownChart"></canvas>
+            <div class="chart-container-modern">
+                <canvas id="costBreakdownChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Budget Utilization Gauge -->
+        <div class="dashboard-widget mt-3">
+            <div class="p-3">
+                <h6 class="mb-3">
+                    <i class="fas fa-gauge me-2 text-warning"></i>
+                    Budget Utilization
+                </h6>
+                <div class="text-center">
+                    <div class="position-relative d-inline-block">
+                        <canvas id="budgetGauge" width="120" height="120"></canvas>
+                        <div class="position-absolute top-50 start-50 translate-middle">
+                            <h4 class="mb-0">{{ budget_utilization|floatformat:1 }}%</h4>
+                            <small class="text-muted">Used</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <small>Budget Used</small>
+                        <small>₹{{ total_spent|floatformat:0|default:0 }}</small>
+                    </div>
+                    <div class="progress-modern">
+                        <div class="progress-bar-modern" style="--progress-width: {% if budget_utilization %}{{ budget_utilization }}{% else %}0{% endif %}%; width: var(--progress-width);"></div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-1">
+                        <small class="text-muted">Remaining</small>
+                        <small class="text-muted">₹{{ total_budget|floatformat:0|default:0 }}</small>
+                    </div>
                 </div>
             </div>
         </div>
@@ -85,43 +370,70 @@
 <!-- Project Completion & Resource Utilization -->
 <div class="row mb-4">
     <!-- Project Completion Progress -->
-    <div class="col-md-6 mb-3">
-        <div class="card">
-            <div class="card-header bg-white">
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-widget">
+            <div class="chart-toolbar">
                 <h5 class="mb-0">
                     <i class="fas fa-tasks me-2 text-primary"></i>
                     Project Completion Status
                 </h5>
+                <a href="{% url 'projects:list' %}" class="btn btn-outline-primary btn-sm">View All</a>
             </div>
-            <div class="card-body">
+            <div class="p-3">
                 {% for project in recent_projects %}
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="fw-semibold">{{ project.name }}</span>
-                        <span class="badge bg-primary">{{ project.completion_percentage }}%</span>
+                <div class="activity-item">
+                    <div class="activity-icon {% if project.completion_percentage == 100 %}success{% elif project.completion_percentage > 50 %}primary{% else %}warning{% endif %}">
+                        <i class="fas fa-{% if project.completion_percentage == 100 %}check{% else %}building{% endif %}"></i>
                     </div>
-                    <div class="progress">
-                        <div class="progress-bar" role="progressbar" style="width: {{ project.completion_percentage }}%"></div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h6 class="mb-0"><a href="{% url 'projects:detail' project.id %}">{{ project.name }}</a></h6>
+                            <div class="d-flex align-items-center gap-2">
+                                <a href="{% url 'projects:edit' project.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                <span class="badge bg-{% if project.completion_percentage == 100 %}success{% elif project.completion_percentage > 50 %}primary{% else %}warning{% endif %}">
+                                    {{ project.completion_percentage }}%
+                                </span>
+                            </div>
+                        </div>
+                        <p class="text-muted mb-2 small">{{ project.company_name }}</p>
+                        <div class="progress-modern">
+                            <div class="progress-bar-modern" role="progressbar" style="--progress-width: {% if project.completion_percentage %}{{ project.completion_percentage }}{% else %}0{% endif %}%; width: var(--progress-width);"></div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-1">
+                            <small class="text-muted">{{ project.get_status_display }}</small>
+                            <small class="text-muted">₹{{ project.estimated_budget|floatformat:0|default:0 }}</small>
+                        </div>
                     </div>
                 </div>
                 {% empty %}
-                <p class="text-muted text-center">No projects found</p>
+                <div class="text-center py-4">
+                    <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No projects found</p>
+                    <a href="{% url 'projects:create' %}" class="btn btn-primary btn-sm">Create First Project</a>
+                </div>
                 {% endfor %}
             </div>
         </div>
     </div>
     
     <!-- Resource Utilization Heatmap -->
-    <div class="col-md-6 mb-3">
-        <div class="card">
-            <div class="card-header bg-white">
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-widget">
+            <div class="chart-toolbar">
                 <h5 class="mb-0">
                     <i class="fas fa-fire me-2 text-primary"></i>
                     Resource Utilization
                 </h5>
+                <div class="chart-controls">
+                    <button class="chart-control-btn active" data-view="heatmap">Heatmap</button>
+                    <button class="chart-control-btn" data-view="chart">Chart</button>
+                </div>
             </div>
-            <div class="card-body">
-                <div id="heatmapContainer" class="heatmap-container"></div>
+            <div class="p-3">
+                <div id="heatmapContainer" class="heatmap-modern"></div>
+                <div id="resourceChartContainer" class="chart-container-modern" style="display: none;">
+                    <canvas id="resourceChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
@@ -129,75 +441,133 @@
 
 <!-- Recent Activity & Upcoming Payments -->
 <div class="row">
-    <!-- Recent Projects -->
-    <div class="col-md-6 mb-3">
-        <div class="card">
-            <div class="card-header bg-white">
+    <!-- Recent Activity -->
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-widget">
+            <div class="chart-toolbar">
                 <h5 class="mb-0">
                     <i class="fas fa-clock me-2 text-primary"></i>
-                    Recent Projects
+                    Recent Activity
                 </h5>
+                <div class="chart-controls">
+                    <button class="chart-control-btn active" data-filter="all">All</button>
+                    <button class="chart-control-btn" data-filter="projects">Projects</button>
+                    <button class="chart-control-btn" data-filter="payments">Payments</button>
+                </div>
             </div>
-            <div class="card-body">
+            <div class="p-3">
                 {% for project in recent_projects %}
-                <div class="d-flex align-items-center mb-3">
-                    <div class="me-3">
-                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                            <i class="fas fa-building text-white"></i>
-                        </div>
+                <div class="activity-item" data-type="projects">
+                    <div class="activity-icon primary">
+                        <i class="fas fa-building"></i>
                     </div>
                     <div class="flex-grow-1">
                         <h6 class="mb-1">{{ project.name }}</h6>
-                        <p class="text-muted mb-0 small">{{ project.company_name }}</p>
-                    </div>
-                    <div>
-                        <span class="badge bg-{{ project.status|yesno:'success,warning,secondary' }}">
-                            {{ project.get_status_display }}
-                        </span>
+                        <p class="text-muted mb-1 small">{{ project.company_name }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-{% if project.status == 'active' %}success{% elif project.status == 'completed' %}primary{% else %}warning{% endif %}">
+                                {{ project.get_status_display }}
+                            </span>
+                            <small class="text-muted">{{ project.created_at|date:"M d, Y" }}</small>
+                        </div>
                     </div>
                 </div>
-                {% empty %}
-                <p class="text-muted text-center">No recent projects</p>
                 {% endfor %}
                 
-                <div class="text-center mt-3">
-                    <a href="{% url 'projects:list' %}" class="btn btn-outline-primary btn-sm">
-                        View All Projects
-                    </a>
+                {% for payment in upcoming_payments %}
+                <div class="activity-item" data-type="payments">
+                    <div class="activity-icon warning">
+                        <i class="fas fa-indian-rupee-sign"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">{{ payment.description }}</h6>
+                        <p class="text-muted mb-1 small">{{ payment.project.name }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-success">₹{{ payment.amount }}</span>
+                            <small class="text-muted">Due: {{ payment.due_date|date:"M d" }}</small>
+                        </div>
+                    </div>
                 </div>
+                {% endfor %}
+                
+                {% if not recent_projects and not upcoming_payments %}
+                <div class="text-center py-4">
+                    <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No recent activity</p>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
     
-    <!-- Upcoming Payments -->
-    <div class="col-md-6 mb-3">
-        <div class="card">
-            <div class="card-header bg-white">
+    <!-- Upcoming Payments & Quick Stats -->
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-widget">
+            <div class="chart-toolbar">
                 <h5 class="mb-0">
                     <i class="fas fa-calendar-alt me-2 text-primary"></i>
-                    Pending Payments
+                    Upcoming Payments
                 </h5>
+                <a href="#" class="btn btn-outline-primary btn-sm">View All</a>
             </div>
-            <div class="card-body">
+            <div class="p-3">
                 {% for payment in upcoming_payments %}
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <div>
-                        <h6 class="mb-1">{{ payment.description }}</h6>
-                        <p class="text-muted mb-0 small">{{ payment.project.name }}</p>
+                <div class="activity-item">
+                    <div class="activity-icon {% if payment.status == 'overdue' %}danger{% elif payment.status == 'pending' %}warning{% else %}success{% endif %}">
+                        <i class="fas fa-{% if payment.status == 'overdue' %}exclamation-triangle{% elif payment.status == 'pending' %}clock{% else %}check{% endif %}"></i>
                     </div>
-                    <div class="text-end">
-                        <div class="fw-bold text-success">${{ payment.amount }}</div>
-                        <small class="text-muted">Due: {{ payment.due_date|date:"M d" }}</small>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">{{ payment.description }}</h6>
+                        <p class="text-muted mb-1 small">{{ payment.project.name }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-{% if payment.status == 'overdue' %}danger{% elif payment.status == 'pending' %}warning{% else %}success{% endif %}">
+                                ₹{{ payment.amount }}
+                            </span>
+                            <small class="text-muted">Due: {{ payment.due_date|date:"M d, Y" }}</small>
+                        </div>
                     </div>
                 </div>
                 {% empty %}
-                <p class="text-muted text-center">No pending payments</p>
+                <div class="text-center py-4">
+                    <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                    <p class="text-muted">No pending payments</p>
+                </div>
                 {% endfor %}
-                
-                <div class="text-center mt-3">
-                    <a href="#" class="btn btn-outline-primary btn-sm">
-                        View All Payments
-                    </a>
+            </div>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="dashboard-widget mt-3">
+            <div class="p-3">
+                <h6 class="mb-3">
+                    <i class="fas fa-chart-bar me-2 text-info"></i>
+                    Quick Stats
+                </h6>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="metric-card text-center">
+                            <h4 class="mb-1 text-success">{{ completed_projects }}</h4>
+                            <small class="text-muted">Completed</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="metric-card text-center">
+                            <h4 class="mb-1 text-warning">{{ active_projects }}</h4>
+                            <small class="text-muted">In Progress</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="metric-card text-center">
+                            <h4 class="mb-1 text-info">{{ upcoming_payments|length }}</h4>
+                            <small class="text-muted">Pending</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="metric-card text-center">
+                            <h4 class="mb-1 text-primary">{{ total_projects }}</h4>
+                            <small class="text-muted">Total</small>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -207,26 +577,38 @@
 <!-- Quick Actions -->
 <div class="row mt-4">
     <div class="col-12">
-        <div class="card">
-            <div class="card-body text-center">
-                <h5 class="mb-3">Quick Actions</h5>
-                <div class="d-flex justify-content-center gap-3 flex-wrap">
-                    <a href="{% url 'projects:create' %}" class="btn btn-primary">
-                        <i class="fas fa-plus me-2"></i>
-                        New Project
-                    </a>
-                    <a href="{% url 'dashboard:project_selection' %}" class="btn btn-outline-primary">
-                        <i class="fas fa-project-diagram me-2"></i>
-                        Manage Projects
-                    </a>
-                    <a href="#" class="btn btn-outline-secondary">
-                        <i class="fas fa-chart-bar me-2"></i>
-                        Generate Report
-                    </a>
-                    <a href="#" class="btn btn-outline-secondary">
-                        <i class="fas fa-users me-2"></i>
-                        Team Management
-                    </a>
+        <div class="dashboard-widget">
+            <div class="p-4 text-center">
+                <h5 class="mb-4">Quick Actions</h5>
+                <div class="row g-3">
+                    <div class="col-lg-3 col-md-6">
+                        <a href="{% url 'projects:create' %}" class="btn btn-primary w-100 py-3">
+                            <i class="fas fa-plus fa-2x mb-2 d-block"></i>
+                            <div>New Project</div>
+                            <small class="opacity-75">Start a new construction project</small>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <a href="{% url 'dashboard:project_selection' %}" class="btn btn-outline-primary w-100 py-3">
+                            <i class="fas fa-project-diagram fa-2x mb-2 d-block"></i>
+                            <div>Manage Projects</div>
+                            <small class="opacity-75">View and edit existing projects</small>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <a href="#" class="btn btn-outline-success w-100 py-3" onclick="generateReport()">
+                            <i class="fas fa-chart-bar fa-2x mb-2 d-block"></i>
+                            <div>Generate Report</div>
+                            <small class="opacity-75">Create project reports</small>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <a href="#" class="btn btn-outline-info w-100 py-3">
+                            <i class="fas fa-users fa-2x mb-2 d-block"></i>
+                            <div>Team Management</div>
+                            <small class="opacity-75">Manage team members</small>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -236,132 +618,559 @@
 
 {% block extra_js %}
 <script>
-// Cash Flow Chart
-const cashFlowData = {{ cash_flow_data|safe }};
-const ctx1 = document.getElementById('cashFlowChart').getContext('2d');
-new Chart(ctx1, {
-    type: 'line',
-    data: {
-        labels: cashFlowData.map(d => d.month),
-        datasets: [{
-            label: 'Income',
-            data: cashFlowData.map(d => d.income),
-            borderColor: '#10b981',
-            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-            tension: 0.4
-        }, {
-            label: 'Expenses',
-            data: cashFlowData.map(d => d.expenses),
-            borderColor: '#ef4444',
-            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-            tension: 0.4
-        }, {
-            label: 'Net Cash Flow',
-            data: cashFlowData.map(d => d.net),
-            borderColor: '#2563eb',
-            backgroundColor: 'rgba(37, 99, 235, 0.1)',
-            tension: 0.4
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'top',
-            }
+// Global variables for charts
+let cashFlowChart, costBreakdownChart, budgetGaugeChart, resourceChart;
+let analyticsData = null;
+
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        initializeCharts();
+        loadAnalyticsData();
+        setupEventListeners();
+        animateCounters();
+    } catch (error) {
+        console.error('Error initializing dashboard:', error);
+    }
+});
+
+// Initialize all charts
+function initializeCharts() {
+    initializeCashFlowChart();
+    initializeCostBreakdownChart();
+    initializeBudgetGauge();
+}
+
+// Cash Flow Chart with enhanced styling
+function initializeCashFlowChart() {
+    try {
+        const cashFlowData = JSON.parse('{{ cash_flow_data|escapejs }}');
+        const cashFlowCtx = document.getElementById('cashFlowChart');
+        if (!cashFlowCtx) {
+            console.error('Cash flow chart canvas not found');
+            return;
+        }
+        const chartCtx = cashFlowCtx.getContext('2d');
+    
+        cashFlowChart = new Chart(chartCtx, {
+        type: 'line',
+        data: {
+            labels: cashFlowData.map(d => d.month),
+            datasets: [{
+                label: 'Income',
+                data: cashFlowData.map(d => d.income),
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderWidth: 3,
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: '#10b981',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }, {
+                label: 'Expenses',
+                data: cashFlowData.map(d => d.expenses),
+                borderColor: '#ef4444',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                borderWidth: 3,
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: '#ef4444',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }, {
+                label: 'Net Cash Flow',
+                data: cashFlowData.map(d => d.net),
+                borderColor: '#2563eb',
+                backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                borderWidth: 3,
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: '#2563eb',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }]
         },
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    callback: function(value) {
-                        return '$' + value.toLocaleString();
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: {
+                            size: 12,
+                            weight: '500'
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#ffffff',
+                    bodyColor: '#ffffff',
+                    borderColor: '#374151',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    displayColors: true,
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ₹' + context.parsed.y.toLocaleString();
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 11,
+                            weight: '500'
+                        },
+                        color: '#6b7280'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(107, 114, 128, 0.1)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 11,
+                            weight: '500'
+                        },
+                        color: '#6b7280',
+                        callback: function(value) {
+                            return '₹' + value.toLocaleString();
+                        }
+                    }
+                }
+            },
+            elements: {
+                line: {
+                    borderJoinStyle: 'round'
+                }
+            }
+        }
+    });
+    } catch (error) {
+        console.error('Error initializing cash flow chart:', error);
+    }
+}
+
+// Cost Breakdown Donut Chart
+function initializeCostBreakdownChart() {
+    const costBreakdownData = JSON.parse('{{ cost_breakdown|escapejs }}');
+    const costBreakdownCtx = document.getElementById('costBreakdownChart').getContext('2d');
+    
+    costBreakdownChart = new Chart(costBreakdownCtx, {
+        type: 'doughnut',
+        data: {
+            labels: costBreakdownData.map(d => d.category),
+            datasets: [{
+                data: costBreakdownData.map(d => d.total),
+                backgroundColor: [
+                    '#2563eb',
+                    '#10b981', 
+                    '#f59e0b',
+                    '#ef4444',
+                    '#8b5cf6',
+                    '#06b6d4',
+                    '#84cc16',
+                    '#f97316'
+                ],
+                borderWidth: 0,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '60%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15,
+                        font: {
+                            size: 11,
+                            weight: '500'
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#ffffff',
+                    bodyColor: '#ffffff',
+                    borderColor: '#374151',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((context.parsed / total) * 100).toFixed(1);
+                            return context.label + ': ₹' + context.parsed.toLocaleString() + ' (' + percentage + '%)';
+                        }
+                    }
+                }
+            },
+            animation: {
+                animateRotate: true,
+                animateScale: true,
+                duration: 1000
+            }
+        }
+    });
+}
+
+// Budget Utilization Gauge
+function initializeBudgetGauge() {
+    const budgetGaugeCtx = document.getElementById('budgetGauge').getContext('2d');
+    const utilization = parseFloat('{{ budget_utilization|floatformat:1|default:0 }}');
+    
+    budgetGaugeChart = new Chart(budgetGaugeCtx, {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [utilization, 100 - utilization],
+                backgroundColor: [
+                    utilization > 80 ? '#ef4444' : utilization > 60 ? '#f59e0b' : '#10b981',
+                    '#e5e7eb'
+                ],
+                borderWidth: 0,
+                cutout: '75%'
+            }]
+        },
+        options: {
+            responsive: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            animation: {
+                animateRotate: true,
+                duration: 1500
+            }
+        }
+    });
+}
+
+// Load analytics data for resource utilization
+function loadAnalyticsData() {
+    fetch('{% url "dashboard:analytics_data" %}')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ₹{response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            analyticsData = data;
+            renderResourceHeatmap(data);
+            initializeResourceChart(data);
+        })
+        .catch(error => {
+            console.error('Error loading analytics data:', error);
+            // Show a fallback message or use default data
+            const heatmapContainer = document.getElementById('heatmapContainer');
+            if (heatmapContainer) {
+                heatmapContainer.innerHTML = '<div class="text-center text-muted p-4">Unable to load resource data</div>';
+            }
+        });
+}
+
+// Render resource utilization heatmap
+function renderResourceHeatmap(data) {
+    const container = d3.select("#heatmapContainer");
+    container.selectAll("*").remove();
+    
+    const margin = {top: 20, right: 20, bottom: 30, left: 80};
+    const width = 400 - margin.left - margin.right;
+    const height = 250 - margin.top - margin.bottom;
+
+    const svg = container
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", `translate(₹{margin.left},₹{margin.top})`);
+
+    const resources = [...new Set(data.resource_data.map(d => d.resource))];
+    const months = [...new Set(data.resource_data.map(d => d.month))];
+
+    const xScale = d3.scaleBand()
+        .domain(months)
+        .range([0, width])
+        .padding(0.1);
+
+    const yScale = d3.scaleBand()
+        .domain(resources)
+        .range([0, height])
+        .padding(0.1);
+
+    const colorScale = d3.scaleSequential(d3.interpolateBlues)
+        .domain([0, 100]);
+
+    svg.selectAll("rect")
+        .data(data.resource_data)
+        .enter()
+        .append("rect")
+        .attr("x", d => xScale(d.month))
+        .attr("y", d => yScale(d.resource))
+        .attr("width", xScale.bandwidth())
+        .attr("height", yScale.bandwidth())
+        .attr("fill", d => colorScale(d.utilization))
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .style("cursor", "pointer")
+        .on("mouseover", function(event, d) {
+            d3.select(this)
+                .attr("stroke", "#374151")
+                .attr("stroke-width", 2);
+            
+            // Show tooltip
+            const tooltip = d3.select("body").append("div")
+                .attr("class", "tooltip")
+                .style("position", "absolute")
+                .style("background", "rgba(0, 0, 0, 0.8)")
+                .style("color", "white")
+                .style("padding", "8px 12px")
+                .style("border-radius", "6px")
+                .style("font-size", "12px")
+                .style("pointer-events", "none")
+                .style("opacity", 0);
+            
+            tooltip.transition().duration(200).style("opacity", 1);
+            tooltip.html(`₹{d.resource}<br/>₹{d.month}<br/>₹{d.utilization}% utilized`);
+        })
+        .on("mousemove", function(event) {
+            d3.select(".tooltip")
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 10) + "px");
+        })
+        .on("mouseout", function() {
+            d3.select(this)
+                .attr("stroke", "none");
+            d3.select(".tooltip").remove();
+        });
+
+    // Add axes
+    svg.append("g")
+        .attr("transform", `translate(0,₹{height})`)
+        .call(d3.axisBottom(xScale))
+        .style("font-size", "11px");
+
+    svg.append("g")
+        .call(d3.axisLeft(yScale))
+        .style("font-size", "11px");
+}
+
+// Initialize resource chart (alternative view)
+function initializeResourceChart(data) {
+    const resourceChartCtx = document.getElementById('resourceChart').getContext('2d');
+    
+    const resourceTotals = {};
+    data.resource_data.forEach(d => {
+        if (!resourceTotals[d.resource]) {
+            resourceTotals[d.resource] = 0;
+        }
+        resourceTotals[d.resource] += d.utilization;
+    });
+    
+    const resources = Object.keys(resourceTotals);
+    const totals = Object.values(resourceTotals);
+    
+    resourceChart = new Chart(resourceChartCtx, {
+        type: 'bar',
+        data: {
+            labels: resources,
+            datasets: [{
+                label: 'Average Utilization (%)',
+                data: totals.map(t => t / 6), // Average over 6 months
+                backgroundColor: [
+                    '#2563eb',
+                    '#10b981',
+                    '#f59e0b',
+                    '#ef4444'
+                ],
+                borderRadius: 6,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
                     }
                 }
             }
         }
-    }
-});
-
-// Cost Breakdown Donut Chart
-const costBreakdownData = {{ cost_breakdown|safe }};
-const ctx2 = document.getElementById('costBreakdownChart').getContext('2d');
-new Chart(ctx2, {
-    type: 'doughnut',
-    data: {
-        labels: costBreakdownData.map(d => d.category),
-        datasets: [{
-            data: costBreakdownData.map(d => d.total),
-            backgroundColor: [
-                '#2563eb',
-                '#10b981',
-                '#f59e0b',
-                '#ef4444',
-                '#8b5cf6',
-                '#06b6d4'
-            ]
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'bottom',
-            }
-        }
-    }
-});
-
-// Resource Utilization Heatmap using D3.js
-fetch('{% url "dashboard:analytics_data" %}')
-    .then(response => response.json())
-    .then(data => {
-        const margin = {top: 20, right: 20, bottom: 30, left: 80};
-        const width = 300 - margin.left - margin.right;
-        const height = 200 - margin.top - margin.bottom;
-
-        const svg = d3.select("#heatmapContainer")
-            .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", `translate(${margin.left},${margin.top})`);
-
-        const resources = [...new Set(data.resource_data.map(d => d.resource))];
-        const months = [...new Set(data.resource_data.map(d => d.month))];
-
-        const xScale = d3.scaleBand()
-            .domain(months)
-            .range([0, width])
-            .padding(0.1);
-
-        const yScale = d3.scaleBand()
-            .domain(resources)
-            .range([0, height])
-            .padding(0.1);
-
-        const colorScale = d3.scaleSequential(d3.interpolateBlues)
-            .domain([0, 100]);
-
-        svg.selectAll("rect")
-            .data(data.resource_data)
-            .enter()
-            .append("rect")
-            .attr("x", d => xScale(d.month))
-            .attr("y", d => yScale(d.resource))
-            .attr("width", xScale.bandwidth())
-            .attr("height", yScale.bandwidth())
-            .attr("fill", d => colorScale(d.utilization))
-            .attr("rx", 3);
-
-        svg.append("g")
-            .attr("transform", `translate(0,${height})`)
-            .call(d3.axisBottom(xScale));
-
-        svg.append("g")
-            .call(d3.axisLeft(yScale));
     });
+}
+
+// Setup event listeners
+function setupEventListeners() {
+    // Chart period controls
+    document.querySelectorAll('.chart-control-btn[data-period]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.chart-control-btn[data-period]').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            // Here you would typically reload data based on period
+            console.log('Period changed to:', this.dataset.period);
+        });
+    });
+    
+    // Resource view controls
+    document.querySelectorAll('.chart-control-btn[data-view]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.chart-control-btn[data-view]').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            const view = this.dataset.view;
+            const heatmapContainer = document.getElementById('heatmapContainer');
+            const chartContainer = document.getElementById('resourceChartContainer');
+            
+            if (view === 'heatmap') {
+                heatmapContainer.style.display = 'block';
+                chartContainer.style.display = 'none';
+            } else {
+                heatmapContainer.style.display = 'none';
+                chartContainer.style.display = 'block';
+            }
+        });
+    });
+    
+    // Activity filter controls
+    document.querySelectorAll('.chart-control-btn[data-filter]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.chart-control-btn[data-filter]').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            const filter = this.dataset.filter;
+            const activityItems = document.querySelectorAll('.activity-item');
+            
+            activityItems.forEach(item => {
+                if (filter === 'all' || item.dataset.type === filter) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+}
+
+// Animate counters on page load
+function animateCounters() {
+    const counters = document.querySelectorAll('.stat-card-modern h2');
+    counters.forEach(counter => {
+        const numericText = counter.textContent.replace(/[^0-9.-]/g, '');
+        const target = parseInt(numericText || '0');
+        const duration = 2000;
+        const increment = target / (duration / 16);
+        let current = 0;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                current = target;
+                clearInterval(timer);
+            }
+            if (counter.textContent.trim().startsWith('₹')) {
+                counter.textContent = '₹' + Math.floor(current).toLocaleString();
+            } else {
+                counter.textContent = Math.floor(current).toLocaleString();
+            }
+        }, 16);
+    });
+}
+
+// Dashboard functions
+function refreshDashboard() {
+    const refreshBtn = event.target;
+    const originalText = refreshBtn.innerHTML;
+    
+    refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Refreshing...';
+    refreshBtn.disabled = true;
+    
+    // Simulate refresh
+    setTimeout(() => {
+        location.reload();
+    }, 1000);
+}
+
+function exportDashboard() {
+    // Create a simple CSV export
+    const data = {
+        'Total Projects': parseInt('{{ total_projects|default:0 }}'),
+        'Active Projects': parseInt('{{ active_projects|default:0 }}'),
+        'Completed Projects': parseInt('{{ completed_projects|default:0 }}'),
+        'Total Budget': parseFloat('{{ total_budget|default:0 }}'),
+        'Total Spent': parseFloat('{{ total_spent|default:0 }}'),
+        'Budget Utilization': '{{ budget_utilization|floatformat:1|default:0 }}%'
+    };
+    
+    const csv = Object.entries(data).map(([key, value]) => `₹{key},₹{value}`).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'dashboard-export.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
+function generateReport() {
+    alert('Report generation feature coming soon!');
+}
+
+// Add smooth scrolling for better UX
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+
+// Add loading states for better UX
+window.addEventListener('load', function() {
+    document.body.classList.add('loaded');
+});
 </script>
 {% endblock %}

@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}Unit {{ unit.unit_number }} - SiteSphere{% endblock %}
+
+{% block page_title %}Unit Details{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card dashboard-widget">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-building me-2 text-primary"></i>
+                    Unit Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Unit Details</h6>
+                        <p><strong>Unit Number:</strong> {{ unit.unit_number }}</p>
+                        <p><strong>Project:</strong> {{ unit.project.name }}</p>
+                        <p><strong>Building:</strong> {{ unit.building.name }}</p>
+                        {% if unit.wing %}
+                            <p><strong>Wing:</strong> {{ unit.wing.name }}</p>
+                        {% endif %}
+                        <p><strong>Floor:</strong> {{ unit.floor_number }}</p>
+                        <p><strong>Type:</strong> {{ unit.unit_type.name }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Area Details</h6>
+                        <p><strong>Carpet Area:</strong> {{ unit.carpet_area|floatformat:0 }} sq ft</p>
+                        <p><strong>Built-up Area:</strong> {{ unit.built_up_area|floatformat:0 }} sq ft</p>
+                        <p><strong>Super Built-up Area:</strong> {{ unit.super_built_up_area|floatformat:0 }} sq ft</p>
+                        {% if unit.facing %}
+                            <p><strong>Facing:</strong> {{ unit.facing }}</p>
+                        {% endif %}
+                        <p><strong>Status:</strong> 
+                            {% if unit.status == 'available' %}
+                                <span class="badge bg-success">Available</span>
+                            {% elif unit.status == 'sold' %}
+                                <span class="badge bg-danger">Sold</span>
+                            {% elif unit.status == 'reserved' %}
+                                <span class="badge bg-warning">Reserved</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ unit.get_status_display }}</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Pricing</h6>
+                        <p><strong>Base Price:</strong> ₹{{ unit.base_price|floatformat:0 }}</p>
+                        <p><strong>Current Price:</strong> ₹{{ unit.current_price|floatformat:0 }}</p>
+                        {% if unit.amenities %}
+                            <p><strong>Amenities:</strong> {{ unit.amenities }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Unit Type Details</h6>
+                        <p><strong>Bedrooms:</strong> {{ unit.unit_type.bedrooms }}</p>
+                        <p><strong>Bathrooms:</strong> {{ unit.unit_type.bathrooms }}</p>
+                        <p><strong>Description:</strong> {{ unit.unit_type.description }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card dashboard-widget">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-handshake me-2 text-primary"></i>
+                    Recent Bookings
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if bookings %}
+                    <div class="list-group list-group-flush">
+                        {% for booking in bookings %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Booking #{{ booking.id }}</h6>
+                                <small class="text-muted">{{ booking.customer.first_name }} {{ booking.customer.last_name }}</small>
+                                <br>
+                                <small class="text-muted">{{ booking.booking_date|date:"M d, Y" }}</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="fw-bold">₹{{ booking.agreement_value|floatformat:0 }}</span>
+                                <br>
+                                <span class="badge bg-{% if booking.status == 'active' %}success{% elif booking.status == 'cancelled' %}danger{% else %}warning{% endif %}">
+                                    {{ booking.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center">No bookings found</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card dashboard-widget mt-3">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-line me-2 text-primary"></i>
+                    Price History
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center">
+                    <h4 class="text-primary">₹{{ unit.current_price|floatformat:0 }}</h4>
+                    <small class="text-muted">Current Price</small>
+                    {% if unit.base_price != unit.current_price %}
+                        <br>
+                        <small class="text-{% if unit.current_price > unit.base_price %}success{% else %}danger{% endif %}">
+                            {% if unit.current_price > unit.base_price %}
+                                +₹{{ unit.current_price|add:unit.base_price|floatformat:0 }} from base
+                            {% else %}
+                                -₹{{ unit.base_price|add:unit.current_price|floatformat:0 }} from base
+                            {% endif %}
+                        </small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'sales:unit_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Units
+            </a>
+            <div>
+                <a href="{% url 'sales:unit_edit' unit.id %}" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-edit me-2"></i>Edit Unit
+                </a>
+                {% if unit.status == 'available' %}
+                    <a href="{% url 'sales:booking_create' %}?unit={{ unit.id }}" class="btn btn-success">
+                        <i class="fas fa-handshake me-2"></i>Create Booking
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+

@@ -1,0 +1,297 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Sale Booking - SiteSphere{% endblock %}
+
+{% block page_title %}{% if booking %}Edit Booking{% else %}Create New Sale Booking{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 offset-lg-2">
+        <div class="card dashboard-widget">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-handshake me-2 text-primary"></i>
+                    Create New Sale Booking
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post" id="bookingForm">
+                    {% csrf_token %}
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.customer.id_for_label }}" class="form-label">Customer <span class="text-danger">*</span></label>
+                            {{ form.customer }}
+                            {% if form.customer.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.customer.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.unit.id_for_label }}" class="form-label">Unit <span class="text-danger">*</span></label>
+                            {{ form.unit }}
+                            {% if form.unit.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.unit.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.booking_date.id_for_label }}" class="form-label">Booking Date <span class="text-danger">*</span></label>
+                            {{ form.booking_date }}
+                            {% if form.booking_date.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.booking_date.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.agreement_value.id_for_label }}" class="form-label">Agreement Value <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+                                {{ form.agreement_value }}
+                            </div>
+                            {% if form.agreement_value.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.agreement_value.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.booking_amount.id_for_label }}" class="form-label">Booking Amount <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+                                {{ form.booking_amount }}
+                            </div>
+                            {% if form.booking_amount.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.booking_amount.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Booking Percentage</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="bookingPercentage" readonly>
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <small class="text-muted">Automatically calculated</small>
+                        </div>
+                    </div>
+
+                    <!-- Unit Details Display -->
+                    <div class="row" id="unitDetails" style="display: none;">
+                        <div class="col-12">
+                            <div class="card bg-light">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Unit Details</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <strong>Unit Number:</strong>
+                                            <span id="unitNumber">-</span>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <strong>Floor:</strong>
+                                            <span id="unitFloor">-</span>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <strong>Area:</strong>
+                                            <span id="unitArea">-</span> sq ft
+                                        </div>
+                                        <div class="col-md-3">
+                                            <strong>Current Price:</strong>
+                                            <span id="unitPrice">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Customer Details Display -->
+                    <div class="row" id="customerDetails" style="display: none;">
+                        <div class="col-12">
+                            <div class="card bg-light">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Customer Details</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <strong>Name:</strong>
+                                            <span id="customerName">-</span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Email:</strong>
+                                            <span id="customerEmail">-</span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Phone:</strong>
+                                            <span id="customerPhone">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'sales:booking_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Bookings
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>{% if booking %}Update Booking{% else %}Create Booking{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const customerSelect = document.getElementById('id_customer');
+    const unitSelect = document.getElementById('id_unit');
+    const agreementValueInput = document.getElementById('id_agreement_value');
+    const bookingAmountInput = document.getElementById('id_booking_amount');
+    const bookingPercentageInput = document.getElementById('bookingPercentage');
+    
+    // Store unit and customer data for display
+    let unitsData = {};
+    let customersData = {};
+    
+    // Load units data
+    fetch('/sales/api/units/')
+        .then(response => response.json())
+        .then(data => {
+            unitsData = data.units || [];
+        })
+        .catch(error => console.error('Error loading units:', error));
+    
+    // Load customers data
+    fetch('/sales/api/customers/')
+        .then(response => response.json())
+        .then(data => {
+            customersData = data.customers || [];
+        })
+        .catch(error => console.error('Error loading customers:', error));
+    
+    // Unit selection handler
+    if (unitSelect) {
+        unitSelect.addEventListener('change', function() {
+            const unitId = this.value;
+            if (unitId && unitsData[unitId]) {
+                const unit = unitsData[unitId];
+                document.getElementById('unitNumber').textContent = unit.unit_number;
+                document.getElementById('unitFloor').textContent = unit.floor_number;
+                document.getElementById('unitArea').textContent = unit.super_built_up_area;
+                document.getElementById('unitPrice').textContent = '₹' + unit.current_price.toLocaleString();
+                document.getElementById('unitDetails').style.display = 'block';
+                
+                // Auto-fill agreement value with unit price
+                if (agreementValueInput && !agreementValueInput.value) {
+                    agreementValueInput.value = unit.current_price;
+                }
+            } else {
+                document.getElementById('unitDetails').style.display = 'none';
+            }
+        });
+    }
+    
+    // Customer selection handler
+    if (customerSelect) {
+        customerSelect.addEventListener('change', function() {
+            const customerId = this.value;
+            if (customerId && customersData[customerId]) {
+                const customer = customersData[customerId];
+                document.getElementById('customerName').textContent = customer.first_name + ' ' + customer.last_name;
+                document.getElementById('customerEmail').textContent = customer.email;
+                document.getElementById('customerPhone').textContent = customer.phone;
+                document.getElementById('customerDetails').style.display = 'block';
+            } else {
+                document.getElementById('customerDetails').style.display = 'none';
+            }
+        });
+    }
+    
+    // Calculate booking percentage
+    function calculateBookingPercentage() {
+        if (agreementValueInput && bookingAmountInput && agreementValueInput.value && bookingAmountInput.value) {
+            const agreementValue = parseFloat(agreementValueInput.value);
+            const bookingAmount = parseFloat(bookingAmountInput.value);
+            if (agreementValue > 0) {
+                const percentage = (bookingAmount / agreementValue) * 100;
+                bookingPercentageInput.value = percentage.toFixed(2);
+            }
+        }
+    }
+    
+    if (agreementValueInput) {
+        agreementValueInput.addEventListener('input', calculateBookingPercentage);
+    }
+    
+    if (bookingAmountInput) {
+        bookingAmountInput.addEventListener('input', calculateBookingPercentage);
+    }
+    
+    // Form validation
+    const form = document.getElementById('bookingForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const requiredFields = ['id_customer', 'id_unit', 'id_booking_date', 'id_agreement_value', 'id_booking_amount'];
+            let isValid = true;
+            
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field && !field.value.trim()) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                } else if (field) {
+                    field.classList.remove('is-invalid');
+                }
+            });
+            
+            // Validate booking amount is not greater than agreement value
+            if (agreementValueInput && bookingAmountInput) {
+                const agreementValue = parseFloat(agreementValueInput.value);
+                const bookingAmount = parseFloat(bookingAmountInput.value);
+                if (bookingAmount > agreementValue) {
+                    bookingAmountInput.classList.add('is-invalid');
+                    isValid = false;
+                    alert('Booking amount cannot be greater than agreement value.');
+                } else {
+                    bookingAmountInput.classList.remove('is-invalid');
+                }
+            }
+            
+            if (!isValid) {
+                e.preventDefault();
+                alert('Please fill in all required fields correctly.');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

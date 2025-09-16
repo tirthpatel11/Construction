@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}Booking #{{ booking.id }} - SiteSphere{% endblock %}
+
+{% block page_title %}Booking Details #{{ booking.id }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card dashboard-widget">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-handshake me-2 text-primary"></i>
+                    Booking Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Customer Details</h6>
+                        <p><strong>Name:</strong> {{ booking.customer.first_name }} {{ booking.customer.last_name }}</p>
+                        <p><strong>Email:</strong> {{ booking.customer.email }}</p>
+                        <p><strong>Phone:</strong> {{ booking.customer.phone }}</p>
+                        <p><strong>Type:</strong> {{ booking.customer.get_customer_type_display }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Unit Details</h6>
+                        <p><strong>Unit:</strong> {{ booking.unit.unit_number }}</p>
+                        <p><strong>Building:</strong> {{ booking.unit.building.name }}</p>
+                        <p><strong>Floor:</strong> {{ booking.unit.floor_number }}</p>
+                        <p><strong>Area:</strong> {{ booking.unit.super_built_up_area }} sq ft</p>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Financial Details</h6>
+                        <p><strong>Agreement Value:</strong> ₹{{ booking.agreement_value|floatformat:0 }}</p>
+                        <p><strong>Booking Amount:</strong> ₹{{ booking.booking_amount|floatformat:0 }}</p>
+                        <p><strong>Booking Percentage:</strong> {{ booking.booking_percentage|floatformat:2 }}%</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Booking Information</h6>
+                        <p><strong>Booking Date:</strong> {{ booking.booking_date|date:"M d, Y" }}</p>
+                        <p><strong>Status:</strong> 
+                            {% if booking.status == 'active' %}
+                                <span class="badge bg-success">Active</span>
+                            {% elif booking.status == 'cancelled' %}
+                                <span class="badge bg-danger">Cancelled</span>
+                            {% else %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Sales Person:</strong> {{ booking.sales_person.get_full_name }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card dashboard-widget">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-calendar-alt me-2 text-primary"></i>
+                    Payment Schedule
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if payment_schedule %}
+                    <div class="list-group list-group-flush">
+                        {% for payment in payment_schedule %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">{{ payment.get_payment_type_display }}</h6>
+                                <small class="text-muted">{{ payment.description }}</small>
+                                <br>
+                                <small class="text-muted">Due: {{ payment.due_date|date:"M d, Y" }}</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="fw-bold">₹{{ payment.amount|floatformat:0 }}</span>
+                                {% if payment.percentage %}
+                                    <br>
+                                    <small class="text-muted">{{ payment.percentage }}%</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center">No payment schedule available</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card dashboard-widget mt-3">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-credit-card me-2 text-primary"></i>
+                    Recent Payments
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if payments %}
+                    <div class="list-group list-group-flush">
+                        {% for payment in payments %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Payment #{{ payment.id }}</h6>
+                                <small class="text-muted">{{ payment.payment_date|date:"M d, Y" }}</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="fw-bold text-success">₹{{ payment.amount|floatformat:0 }}</span>
+                                <br>
+                                <small class="text-muted">{{ payment.get_payment_method_display }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center">No payments recorded</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'sales:booking_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Bookings
+            </a>
+            <div>
+                <a href="{% url 'sales:booking_edit' booking.id %}" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-edit me-2"></i>Edit Booking
+                </a>
+                <a href="{% url 'sales:payment_create' booking.id %}" class="btn btn-success">
+                    <i class="fas fa-plus me-2"></i>Add Payment
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

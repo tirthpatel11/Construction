@@ -52,13 +52,13 @@
                 <div class="row text-center mb-3">
                     <div class="col-6">
                         <div class="border-end">
-                            <h6 class="text-primary mb-0">${{ project.estimated_budget|floatformat:0 }}</h6>
+                            <h6 class="text-primary mb-0">₹{{ project.estimated_budget|floatformat:0 }}</h6>
                             <small class="text-muted">Budget</small>
                         </div>
                     </div>
                     <div class="col-6">
                         <h6 class="text-{% if project.actual_cost > project.estimated_budget %}danger{% else %}success{% endif %} mb-0">
-                            ${{ project.actual_cost|floatformat:0 }}
+                            ₹{{ project.actual_cost|floatformat:0 }}
                         </h6>
                         <small class="text-muted">Spent</small>
                     </div>

@@ -80,7 +80,7 @@ class ProjectExpense(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"{self.project.name} - {self.category} - ${self.amount}"
+        return f"{self.project.name} - {self.category} - ₹{self.amount}"
 
 
 class ProjectPayment(models.Model):
@@ -101,7 +101,7 @@ class ProjectPayment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"{self.project.name} - Payment - ${self.amount}"
+        return f"{self.project.name} - Payment - ₹{self.amount}"
 
 
 class ProjectTimeline(models.Model):
@@ -118,3 +118,20 @@ class ProjectTimeline(models.Model):
     
     def __str__(self):
         return f"{self.project.name} - {self.title}"
+
+
+class ProjectProgressSnapshot(models.Model):
+    """Daily snapshot of computed project progress and EVM metrics."""
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='progress_snapshots')
+    snapshot_date = models.DateField(default=timezone.now)
+    progress_percent = models.DecimalField(max_digits=6, decimal_places=2)
+    spi = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    cpi = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('project', 'snapshot_date')
+        ordering = ['-snapshot_date']
+
+    def __str__(self):
+        return f"{self.project.name} - {self.snapshot_date} - {self.progress_percent}%"

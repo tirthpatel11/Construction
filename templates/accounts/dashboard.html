@@ -4,138 +4,470 @@
 
 {% block page_title %}Accounts Dashboard{% endblock %}
 
+{% block extra_css %}
+<style>
+    .dashboard-widget {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .dashboard-widget:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+    
+    .stat-card-modern {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 20px;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card-modern::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: scale(0);
+        transition: transform 0.6s ease;
+    }
+    
+    .stat-card-modern:hover::before {
+        transform: scale(1);
+    }
+    
+    .stat-card-success {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+    
+    .stat-card-warning {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .stat-card-danger {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .chart-container-modern {
+        position: relative;
+        height: 350px;
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+    
+    .metric-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border-left: 4px solid var(--primary-color);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .metric-card.success {
+        border-left-color: var(--success-color);
+    }
+    
+    .metric-card.warning {
+        border-left-color: var(--warning-color);
+    }
+    
+    .metric-card.danger {
+        border-left-color: var(--danger-color);
+    }
+    
+    .progress-modern {
+        height: 12px;
+        border-radius: 20px;
+        background: linear-gradient(90deg, #e2e8f0 0%, #f1f5f9 100%);
+        overflow: hidden;
+    }
+    
+    .progress-bar-modern {
+        background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+        border-radius: 20px;
+        transition: width 0.8s ease;
+    }
+    
+    .activity-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border-radius: 12px;
+        margin-bottom: 0.5rem;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .activity-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 1.2rem;
+    }
+    
+    .activity-icon.primary {
+        background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+        color: white;
+    }
+    
+    .activity-icon.success {
+        background: linear-gradient(135deg, var(--success-color), #059669);
+        color: white;
+    }
+    
+    .activity-icon.warning {
+        background: linear-gradient(135deg, var(--warning-color), #d97706);
+        color: white;
+    }
+    
+    .chart-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .chart-controls {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .chart-control-btn {
+        padding: 0.5rem 1rem;
+        border: 1px solid #e2e8f0;
+        background: white;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.875rem;
+    }
+    
+    .chart-control-btn:hover,
+    .chart-control-btn.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+    
+    .financial-summary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
+<!-- Welcome Section -->
 <div class="row mb-4">
-    <div class="col-md-3 mb-3">
-        <div class="card stat-card">
-            <div class="card-body text-center">
-                <i class="fas fa-book fa-2x mb-2"></i>
-                <h3 class="mb-1">{{ recent_entries.count }}</h3>
-                <p class="mb-0">Journal Entries</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card stat-card success">
-            <div class="card-body text-center">
-                <i class="fas fa-dollar-sign fa-2x mb-2"></i>
-                <h3 class="mb-1">${{ total_debit|floatformat:0 }}</h3>
-                <p class="mb-0">Total Debits</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card stat-card warning">
-            <div class="card-body text-center">
-                <i class="fas fa-credit-card fa-2x mb-2"></i>
-                <h3 class="mb-1">${{ total_credit|floatformat:0 }}</h3>
-                <p class="mb-0">Total Credits</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card stat-card">
-            <div class="card-body text-center">
-                <i class="fas fa-chart-pie fa-2x mb-2"></i>
-                <h3 class="mb-1">{{ budgets.count }}</h3>
-                <p class="mb-0">Active Budgets</p>
+    <div class="col-12">
+        <div class="dashboard-widget">
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="mb-2">Financial Overview 💰</h3>
+                        <p class="text-muted mb-0">Track your financial health with comprehensive accounting insights.</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-primary btn-sm" onclick="refreshDashboard()">
+                            <i class="fas fa-sync-alt me-1"></i> Refresh
+                        </button>
+                        <button class="btn btn-primary btn-sm" onclick="exportFinancialReport()">
+                            <i class="fas fa-download me-1"></i> Export Report
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-6 mb-4">
-        <div class="card">
-            <div class="card-header bg-white">
-                <h5 class="mb-0">
-                    <i class="fas fa-book me-2 text-primary"></i>
-                    Recent Journal Entries
-                </h5>
+<!-- Financial Summary -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="financial-summary">
+            <div class="row text-center">
+                <div class="col-md-3">
+                    <h2 class="mb-1">₹{{ total_debit|floatformat:0|default:0 }}</h2>
+                    <p class="mb-0 opacity-75">Total Debits</p>
+                </div>
+                <div class="col-md-3">
+                    <h2 class="mb-1">₹{{ total_credit|floatformat:0|default:0 }}</h2>
+                    <p class="mb-0 opacity-75">Total Credits</p>
+                </div>
+                <div class="col-md-3">
+                    <h2 class="mb-1">₹{{ net_balance|floatformat:0|default:0 }}</h2>
+                    <p class="mb-0 opacity-75">Net Balance</p>
+                </div>
+                <div class="col-md-3">
+                    <h2 class="mb-1">{{ recent_entries.count|default:0 }}</h2>
+                    <p class="mb-0 opacity-75">Journal Entries</p>
+                </div>
             </div>
-            <div class="card-body">
-                {% if recent_entries %}
-                    {% for entry in recent_entries %}
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                            <h6 class="mb-1">{{ entry.entry_number }}</h6>
-                            <small class="text-muted">{{ entry.description|truncatechars:50 }}</small>
-                        </div>
-                        <div class="text-end">
-                            <div class="fw-bold text-success">${{ entry.total_debit|floatformat:0 }}</div>
-                            <small class="text-muted">{{ entry.entry_date|date:"M d, Y" }}</small>
-                        </div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                <p class="text-muted text-center">No journal entries yet</p>
-                {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stat-card-modern">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h2 class="mb-1">{{ recent_entries.count|default:0 }}</h2>
+                    <p class="mb-0 opacity-75">Journal Entries</p>
+                    <small class="opacity-75">
+                        <i class="fas fa-book me-1"></i>
+                        This month: {{ monthly_entries|default:0 }}
+                    </small>
+                </div>
+                <div class="fs-1 opacity-25">
+                    <i class="fas fa-book"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stat-card-modern stat-card-success">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h2 class="mb-1">₹{{ total_debit|floatformat:0|default:0 }}</h2>
+                    <p class="mb-0 opacity-75">Total Debits</p>
+                    <small class="opacity-75">
+                        <i class="fas fa-arrow-up me-1"></i>
+                        +{{ monthly_debit|default:0|floatformat:0 }} this month
+                    </small>
+                </div>
+                <div class="fs-1 opacity-25">
+                    <i class="fas fa-arrow-up"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stat-card-modern stat-card-warning">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h2 class="mb-1">₹{{ total_credit|floatformat:0|default:0 }}</h2>
+                    <p class="mb-0 opacity-75">Total Credits</p>
+                    <small class="opacity-75">
+                        <i class="fas fa-arrow-down me-1"></i>
+                        +{{ monthly_credit|default:0|floatformat:0 }} this month
+                    </small>
+                </div>
+                <div class="fs-1 opacity-25">
+                    <i class="fas fa-arrow-down"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stat-card-modern stat-card-danger">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h2 class="mb-1">{{ budgets.count|default:0 }}</h2>
+                    <p class="mb-0 opacity-75">Active Budgets</p>
+                    <small class="opacity-75">
+                        <i class="fas fa-chart-pie me-1"></i>
+                        ₹{{ total_budget_value|default:0|floatformat:0 }} total
+                    </small>
+                </div>
+                <div class="fs-1 opacity-25">
+                    <i class="fas fa-wallet"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <!-- Cash Flow Chart -->
+    <div class="col-lg-8 mb-4">
+        <div class="dashboard-widget">
+            <div class="chart-toolbar">
+                <div>
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line me-2 text-primary"></i>
+                        Cash Flow Analysis
+                    </h5>
+                    <small class="text-muted">Income vs Expenses over the last 6 months</small>
+                </div>
+                <div class="chart-controls">
+                    <button class="chart-control-btn active" data-period="6m">6M</button>
+                    <button class="chart-control-btn" data-period="1y">1Y</button>
+                    <button class="chart-control-btn" data-period="all">All</button>
+                </div>
+            </div>
+            <div class="chart-container-modern">
+                <canvas id="cashFlowChart"></canvas>
             </div>
         </div>
     </div>
     
-    <div class="col-md-6 mb-4">
-        <div class="card">
-            <div class="card-header bg-white">
+    <!-- Account Balance & Budget Utilization -->
+    <div class="col-lg-4 mb-4">
+        <div class="dashboard-widget">
+            <div class="chart-toolbar">
                 <h5 class="mb-0">
                     <i class="fas fa-chart-pie me-2 text-primary"></i>
-                    Active Budgets
+                    Account Balance
                 </h5>
             </div>
-            <div class="card-body">
-                {% if budgets %}
-                    {% for budget in budgets|slice:":5" %}
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                            <h6 class="mb-1">{{ budget.name }}</h6>
-                            <small class="text-muted">{{ budget.project.name }} - {{ budget.financial_year }}</small>
-                        </div>
-                        <div class="text-end">
-                            <div class="fw-bold text-success">${{ budget.total_budget|floatformat:0 }}</div>
+            <div class="chart-container-modern">
+                <canvas id="accountBalanceChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Budget Utilization Gauge -->
+        <div class="dashboard-widget mt-3">
+            <div class="p-3">
+                <h6 class="mb-3">
+                    <i class="fas fa-gauge me-2 text-warning"></i>
+                    Budget Utilization
+                </h6>
+                <div class="text-center">
+                    <div class="position-relative d-inline-block">
+                        <canvas id="budgetGauge" width="120" height="120"></canvas>
+                        <div class="position-absolute top-50 start-50 translate-middle">
+                            <h4 class="mb-0">{{ budget_utilization|default:0|floatformat:1 }}%</h4>
+                            <small class="text-muted">Used</small>
                         </div>
                     </div>
-                    {% endfor %}
-                {% else %}
-                <p class="text-muted text-center">No budgets yet</p>
-                {% endif %}
+                </div>
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <small>Budget Used</small>
+                        <small>₹{{ budget_used|default:0|floatformat:0 }}</small>
+                    </div>
+                    <div class="progress-modern">
+                        <div class="progress-bar-modern" style="--progress-width: {% if budget_utilization %}{{ budget_utilization }}{% else %}0{% endif %}%; width: var(--progress-width);"></div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-1">
+                        <small class="text-muted">Remaining</small>
+                        <small class="text-muted">₹{{ budget_remaining|default:0|floatformat:0 }}</small>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header bg-white">
+<!-- Recent Activities & Financial Reports -->
+<div class="row mb-4">
+    <!-- Recent Journal Entries -->
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-widget">
+            <div class="chart-toolbar">
                 <h5 class="mb-0">
-                    <i class="fas fa-tools me-2 text-primary"></i>
-                    Quick Actions
+                    <i class="fas fa-book me-2 text-primary"></i>
+                    Recent Journal Entries
+                </h5>
+                <a href="{% url 'accounts:journal_entry_list' %}" class="btn btn-outline-primary btn-sm">View All</a>
+            </div>
+            <div class="p-3">
+                {% for entry in recent_entries %}
+                <div class="activity-item">
+                    <div class="activity-icon primary">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">{{ entry.entry_number }}</h6>
+                        <p class="text-muted mb-1 small">{{ entry.description|truncatechars:50 }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-success">₹{{ entry.total_debit|floatformat:0|default:0 }}</span>
+                            <small class="text-muted">{{ entry.entry_date|date:"M d, Y" }}</small>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-4">
+                    <i class="fas fa-book fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No journal entries yet</p>
+                    <a href="{% url 'accounts:journal_entry_create' %}" class="btn btn-primary btn-sm">Create First Entry</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Financial Reports & Quick Stats -->
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-widget">
+            <div class="chart-toolbar">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-bar me-2 text-primary"></i>
+                    Financial Reports
                 </h5>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3 mb-3">
-                        <a href="{% url 'accounts:journal_entry_create' %}" class="btn btn-primary w-100">
-                            <i class="fas fa-plus me-2"></i>
-                            Create Journal Entry
-                        </a>
+            <div class="p-3">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="metric-card text-center">
+                            <h4 class="mb-1 text-success">{{ monthly_entries|default:0 }}</h4>
+                            <small class="text-muted">This Month</small>
+                        </div>
                     </div>
-                    <div class="col-md-3 mb-3">
-                        <a href="{% url 'accounts:budget_create' %}" class="btn btn-success w-100">
-                            <i class="fas fa-dollar-sign me-2"></i>
-                            Create Budget
-                        </a>
+                    <div class="col-6">
+                        <div class="metric-card text-center">
+                            <h4 class="mb-1 text-warning">{{ pending_entries|default:0 }}</h4>
+                            <small class="text-muted">Pending</small>
+                        </div>
                     </div>
-                    <div class="col-md-3 mb-3">
-                        <a href="{% url 'accounts:trial_balance' %}" class="btn btn-warning w-100">
-                            <i class="fas fa-balance-scale me-2"></i>
-                            Trial Balance
-                        </a>
+                    <div class="col-6">
+                        <div class="metric-card text-center">
+                            <h4 class="mb-1 text-info">{{ budgets.count|default:0 }}</h4>
+                            <small class="text-muted">Budgets</small>
+                        </div>
                     </div>
-                    <div class="col-md-3 mb-3">
-                        <a href="{% url 'accounts:profit_loss' %}" class="btn btn-info w-100">
-                            <i class="fas fa-chart-line me-2"></i>
-                            P&L Statement
+                    <div class="col-6">
+                        <div class="metric-card text-center">
+                            <h4 class="mb-1 text-primary">{{ accounts_count|default:0 }}</h4>
+                            <small class="text-muted">Accounts</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h6 class="mb-3">Quick Reports</h6>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'accounts:trial_balance' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-balance-scale me-2"></i>Trial Balance
+                        </a>
+                        <a href="{% url 'accounts:profit_loss' %}" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-chart-line me-2"></i>Profit & Loss
+                        </a>
+                        <a href="{% url 'accounts:balance_sheet' %}" class="btn btn-outline-warning btn-sm">
+                            <i class="fas fa-file-invoice me-2"></i>Balance Sheet
+                        </a>
+                        <a href="{% url 'accounts:cash_flow' %}" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-water me-2"></i>Cash Flow
                         </a>
                     </div>
                 </div>
@@ -143,4 +475,349 @@
         </div>
     </div>
 </div>
+
+<!-- Quick Actions -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="dashboard-widget">
+            <div class="p-4 text-center">
+                <h5 class="mb-4">Quick Actions</h5>
+                <div class="row g-3">
+                    <div class="col-lg-3 col-md-6">
+                        <a href="{% url 'accounts:journal_entry_create' %}" class="btn btn-primary w-100 py-3">
+                            <i class="fas fa-plus fa-2x mb-2 d-block"></i>
+                            <div>Create Entry</div>
+                            <small class="opacity-75">New journal entry</small>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <a href="{% url 'accounts:budget_create' %}" class="btn btn-outline-primary w-100 py-3">
+                            <i class="fas fa-wallet fa-2x mb-2 d-block"></i>
+                            <div>Create Budget</div>
+                            <small class="opacity-75">Financial planning</small>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <a href="{% url 'accounts:chart_of_accounts' %}" class="btn btn-outline-success w-100 py-3">
+                            <i class="fas fa-list fa-2x mb-2 d-block"></i>
+                            <div>Chart of Accounts</div>
+                            <small class="opacity-75">Manage accounts</small>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <a href="{% url 'accounts:trial_balance' %}" class="btn btn-outline-info w-100 py-3">
+                            <i class="fas fa-balance-scale fa-2x mb-2 d-block"></i>
+                            <div>Generate Reports</div>
+                            <small class="opacity-75">Financial reports</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Global variables for charts
+let cashFlowChart, accountBalanceChart, budgetGaugeChart;
+let accountsData = null;
+
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        initializeCharts();
+        loadAccountsData();
+        setupEventListeners();
+        animateCounters();
+    } catch (error) {
+        console.error('Error initializing accounts dashboard:', error);
+    }
+});
+
+// Initialize all charts
+function initializeCharts() {
+    initializeCashFlowChart();
+    initializeAccountBalanceChart();
+    initializeBudgetGauge();
+}
+
+// Cash Flow Chart
+function initializeCashFlowChart() {
+    try {
+        const cashFlowData = JSON.parse('{{ cash_flow_data|escapejs|default:"[]" }}');
+        const ctx = document.getElementById('cashFlowChart');
+        if (!ctx) {
+            console.error('Cash flow chart canvas not found');
+            return;
+        }
+        const chartCtx = ctx.getContext('2d');
+    
+        cashFlowChart = new Chart(chartCtx, {
+            type: 'line',
+            data: {
+                labels: cashFlowData.map(d => d.month),
+                datasets: [{
+                    label: 'Income',
+                    data: cashFlowData.map(d => d.income),
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#10b981',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                }, {
+                    label: 'Expenses',
+                    data: cashFlowData.map(d => d.expenses),
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#ef4444',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                }, {
+                    label: 'Net Cash Flow',
+                    data: cashFlowData.map(d => d.net),
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#2563eb',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: {
+                                size: 12,
+                                weight: '500'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#ffffff',
+                        bodyColor: '#ffffff',
+                        borderColor: '#374151',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ₹' + context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 11,
+                                weight: '500'
+                            },
+                            color: '#6b7280'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(107, 114, 128, 0.1)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 11,
+                                weight: '500'
+                            },
+                            color: '#6b7280',
+                            callback: function(value) {
+                                return '₹' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error initializing cash flow chart:', error);
+    }
+}
+
+// Account Balance Donut Chart
+function initializeAccountBalanceChart() {
+    const accountData = JSON.parse('{{ account_balance_data|escapejs|default:"[]" }}');
+    const ctx = document.getElementById('accountBalanceChart').getContext('2d');
+    
+    accountBalanceChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: accountData.map(d => d.account_type),
+            datasets: [{
+                data: accountData.map(d => d.balance),
+                backgroundColor: [
+                    '#2563eb',
+                    '#10b981', 
+                    '#f59e0b',
+                    '#ef4444',
+                    '#8b5cf6',
+                    '#06b6d4'
+                ],
+                borderWidth: 0,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '60%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15,
+                        font: {
+                            size: 11,
+                            weight: '500'
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#ffffff',
+                    bodyColor: '#ffffff',
+                    borderColor: '#374151',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ₹' + context.parsed.toLocaleString();
+                        }
+                    }
+                }
+            },
+            animation: {
+                animateRotate: true,
+                animateScale: true,
+                duration: 1000
+            }
+        }
+    });
+}
+
+// Budget Utilization Gauge
+function initializeBudgetGauge() {
+    const ctx = document.getElementById('budgetGauge').getContext('2d');
+    const utilization = parseFloat('{{ budget_utilization|floatformat:1|default:0 }}');
+    
+    budgetGaugeChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [utilization, 100 - utilization],
+                backgroundColor: [
+                    utilization > 80 ? '#ef4444' : utilization > 60 ? '#f59e0b' : '#10b981',
+                    '#e5e7eb'
+                ],
+                borderWidth: 0,
+                cutout: '75%'
+            }]
+        },
+        options: {
+            responsive: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            animation: {
+                animateRotate: true,
+                duration: 1500
+            }
+        }
+    });
+}
+
+// Load accounts data
+function loadAccountsData() {
+    console.log('Accounts data loaded');
+}
+
+// Setup event listeners
+function setupEventListeners() {
+    // Chart period controls
+    document.querySelectorAll('.chart-control-btn[data-period]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.chart-control-btn[data-period]').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            console.log('Period changed to:', this.dataset.period);
+        });
+    });
+}
+
+// Animate counters on page load
+function animateCounters() {
+    const counters = document.querySelectorAll('.stat-card-modern h2, .financial-summary h2');
+    counters.forEach(counter => {
+        const target = parseInt(counter.textContent.replace(/[₹,]/g, ''));
+        const duration = 2000;
+        const increment = target / (duration / 16);
+        let current = 0;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                current = target;
+                clearInterval(timer);
+            }
+            counter.textContent = '₹' + Math.floor(current).toLocaleString();
+        }, 16);
+    });
+}
+
+// Dashboard functions
+function refreshDashboard() {
+    const refreshBtn = event.target;
+    const originalText = refreshBtn.innerHTML;
+    
+    refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Refreshing...';
+    refreshBtn.disabled = true;
+    
+    setTimeout(() => {
+        location.reload();
+    }, 1000);
+}
+
+function exportFinancialReport() {
+    alert('Financial report export feature coming soon!');
+}
+</script>
 {% endblock %}

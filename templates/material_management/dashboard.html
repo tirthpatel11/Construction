@@ -4,142 +4,510 @@
 
 {% block page_title %}Material Management Dashboard{% endblock %}
 
+{% block extra_css %}
+<style>
+    .dashboard-widget {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .dashboard-widget:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+    
+    .stat-card-modern {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 20px;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card-modern::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: scale(0);
+        transition: transform 0.6s ease;
+    }
+    
+    .stat-card-modern:hover::before {
+        transform: scale(1);
+    }
+    
+    .stat-card-success {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+    
+    .stat-card-warning {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .stat-card-danger {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .chart-container-modern {
+        position: relative;
+        height: 350px;
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+    
+    .metric-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border-left: 4px solid var(--primary-color);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .metric-card.success {
+        border-left-color: var(--success-color);
+    }
+    
+    .metric-card.warning {
+        border-left-color: var(--warning-color);
+    }
+    
+    .metric-card.danger {
+        border-left-color: var(--danger-color);
+    }
+    
+    .progress-modern {
+        height: 12px;
+        border-radius: 20px;
+        background: linear-gradient(90deg, #e2e8f0 0%, #f1f5f9 100%);
+        overflow: hidden;
+    }
+    
+    .progress-bar-modern {
+        background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+        border-radius: 20px;
+        transition: width 0.8s ease;
+    }
+    
+    .activity-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border-radius: 12px;
+        margin-bottom: 0.5rem;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .activity-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 1.2rem;
+    }
+    
+    .activity-icon.primary {
+        background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+        color: white;
+    }
+    
+    .activity-icon.success {
+        background: linear-gradient(135deg, var(--success-color), #059669);
+        color: white;
+    }
+    
+    .activity-icon.warning {
+        background: linear-gradient(135deg, var(--warning-color), #d97706);
+        color: white;
+    }
+    
+    .chart-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .chart-controls {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .chart-control-btn {
+        padding: 0.5rem 1rem;
+        border: 1px solid #e2e8f0;
+        background: white;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.875rem;
+    }
+    
+    .chart-control-btn:hover,
+    .chart-control-btn.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+    
+    .inventory-summary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
+<!-- Welcome Section -->
 <div class="row mb-4">
-    <div class="col-md-3 mb-3">
-        <div class="card stat-card">
-            <div class="card-body text-center">
-                <i class="fas fa-truck fa-2x mb-2"></i>
-                <h3 class="mb-1">{{ suppliers.count }}</h3>
-                <p class="mb-0">Active Suppliers</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card stat-card success">
-            <div class="card-body text-center">
-                <i class="fas fa-boxes fa-2x mb-2"></i>
-                <h3 class="mb-1">{{ materials.count }}</h3>
-                <p class="mb-0">Materials</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card stat-card warning">
-            <div class="card-body text-center">
-                <i class="fas fa-shopping-cart fa-2x mb-2"></i>
-                <h3 class="mb-1">{{ purchase_orders.count }}</h3>
-                <p class="mb-0">Purchase Orders</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card stat-card">
-            <div class="card-body text-center">
-                <i class="fas fa-clipboard-list fa-2x mb-2"></i>
-                <h3 class="mb-1">{{ requisitions.count }}</h3>
-                <p class="mb-0">Requisitions</p>
+    <div class="col-12">
+        <div class="dashboard-widget">
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="mb-2">Material Management 📦</h3>
+                        <p class="text-muted mb-0">Track inventory, suppliers, purchase orders, and material requisitions.</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-primary btn-sm" onclick="refreshDashboard()">
+                            <i class="fas fa-sync-alt me-1"></i> Refresh
+                        </button>
+                        <button class="btn btn-primary btn-sm" onclick="exportInventoryReport()">
+                            <i class="fas fa-download me-1"></i> Export Report
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-6 mb-4">
-        <div class="card">
-            <div class="card-header bg-white">
+<!-- Inventory Summary -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="inventory-summary">
+            <div class="row text-center">
+                <div class="col-md-3">
+                    <h2 class="mb-1">{{ suppliers.count|default:0 }}</h2>
+                    <p class="mb-0 opacity-75">Active Suppliers</p>
+                </div>
+                <div class="col-md-3">
+                    <h2 class="mb-1">{{ materials.count|default:0 }}</h2>
+                    <p class="mb-0 opacity-75">Materials</p>
+                </div>
+                <div class="col-md-3">
+                    <h2 class="mb-1">₹{{ total_inventory_value|floatformat:0|default:0 }}</h2>
+                    <p class="mb-0 opacity-75">Inventory Value</p>
+                </div>
+                <div class="col-md-3">
+                    <h2 class="mb-1">{{ purchase_orders.count|default:0 }}</h2>
+                    <p class="mb-0 opacity-75">Purchase Orders</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stat-card-modern">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h2 class="mb-1">{{ suppliers.count|default:0 }}</h2>
+                    <p class="mb-0 opacity-75">Active Suppliers</p>
+                    <small class="opacity-75">
+                        <i class="fas fa-truck me-1"></i>
+                        {{ new_suppliers_this_month|default:0 }} this month
+                    </small>
+                </div>
+                <div class="fs-1 opacity-25">
+                    <i class="fas fa-truck"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stat-card-modern stat-card-success">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h2 class="mb-1">{{ materials.count|default:0 }}</h2>
+                    <p class="mb-0 opacity-75">Materials</p>
+                    <small class="opacity-75">
+                        <i class="fas fa-boxes me-1"></i>
+                        {{ low_stock_materials|default:0 }} low stock
+                    </small>
+                </div>
+                <div class="fs-1 opacity-25">
+                    <i class="fas fa-boxes"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stat-card-modern stat-card-warning">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h2 class="mb-1">{{ purchase_orders.count|default:0 }}</h2>
+                    <p class="mb-0 opacity-75">Purchase Orders</p>
+                    <small class="opacity-75">
+                        <i class="fas fa-shopping-cart me-1"></i>
+                        ₹{{ total_po_value|floatformat:0|default:0 }} total value
+                    </small>
+                </div>
+                <div class="fs-1 opacity-25">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stat-card-modern stat-card-danger">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h2 class="mb-1">{{ requisitions.count|default:0 }}</h2>
+                    <p class="mb-0 opacity-75">Requisitions</p>
+                    <small class="opacity-75">
+                        <i class="fas fa-clipboard-list me-1"></i>
+                        {{ pending_requisitions|default:0 }} pending
+                    </small>
+                </div>
+                <div class="fs-1 opacity-25">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <!-- Inventory Analysis Chart -->
+    <div class="col-lg-8 mb-4">
+        <div class="dashboard-widget">
+            <div class="chart-toolbar">
+                <div>
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line me-2 text-primary"></i>
+                        Inventory Analysis
+                    </h5>
+                    <small class="text-muted">Material consumption and stock levels over time</small>
+                </div>
+                <div class="chart-controls">
+                    <button class="chart-control-btn active" data-period="6m">6M</button>
+                    <button class="chart-control-btn" data-period="1y">1Y</button>
+                    <button class="chart-control-btn" data-period="all">All</button>
+                </div>
+            </div>
+            <div class="chart-container-modern">
+                <canvas id="inventoryAnalysisChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Material Categories & Stock Levels -->
+    <div class="col-lg-4 mb-4">
+        <div class="dashboard-widget">
+            <div class="chart-toolbar">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-pie me-2 text-primary"></i>
+                    Material Categories
+                </h5>
+            </div>
+            <div class="chart-container-modern">
+                <canvas id="materialCategoriesChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Stock Level Gauge -->
+        <div class="dashboard-widget mt-3">
+            <div class="p-3">
+                <h6 class="mb-3">
+                    <i class="fas fa-gauge me-2 text-warning"></i>
+                    Stock Level Health
+                </h6>
+                <div class="text-center">
+                    <div class="position-relative d-inline-block">
+                        <canvas id="stockLevelGauge" width="120" height="120"></canvas>
+                        <div class="position-absolute top-50 start-50 translate-middle">
+                            <h4 class="mb-0">{{ stock_health_score|default:0|floatformat:1 }}%</h4>
+                            <small class="text-muted">Healthy</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <small>In Stock</small>
+                        <small>{{ in_stock_materials|default:0 }}</small>
+                    </div>
+                    <div class="progress-modern">
+                        <div class="progress-bar-modern" style="--progress-width: {% if stock_health_score %}{{ stock_health_score }}{% else %}0{% endif %}%; width: var(--progress-width);"></div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-1">
+                        <small class="text-muted">Low Stock</small>
+                        <small class="text-muted">{{ low_stock_materials|default:0 }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activities & Supplier Performance -->
+<div class="row mb-4">
+    <!-- Recent Purchase Orders -->
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-widget">
+            <div class="chart-toolbar">
                 <h5 class="mb-0">
                     <i class="fas fa-shopping-cart me-2 text-primary"></i>
                     Recent Purchase Orders
                 </h5>
+                <a href="{% url 'material_management:purchase_order_list' %}" class="btn btn-outline-primary btn-sm">View All</a>
             </div>
-            <div class="card-body">
-                {% if purchase_orders %}
-                    {% for po in purchase_orders|slice:":5" %}
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                            <h6 class="mb-1">{{ po.po_number }}</h6>
-                            <small class="text-muted">{{ po.supplier.name }} - {{ po.project.name }}</small>
-                        </div>
-                        <div class="text-end">
-                            <div class="fw-bold text-success">${{ po.total_amount|floatformat:0 }}</div>
+            <div class="p-3">
+                {% for po in recent_purchase_orders %}
+                <div class="activity-item">
+                    <div class="activity-icon {% if po.status == 'completed' %}success{% elif po.status == 'pending' %}warning{% else %}primary{% endif %}">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">{{ po.po_number }}</h6>
+                        <p class="text-muted mb-1 small">{{ po.supplier.name }} - {{ po.project.name }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-success">₹{{ po.total_amount|floatformat:0|default:0 }}</span>
                             <span class="badge bg-{% if po.status == 'completed' %}success{% elif po.status == 'pending' %}warning{% else %}secondary{% endif %}">
                                 {{ po.get_status_display }}
                             </span>
                         </div>
                     </div>
-                    {% endfor %}
-                {% else %}
-                <p class="text-muted text-center">No purchase orders yet</p>
-                {% endif %}
+                </div>
+                {% empty %}
+                <div class="text-center py-4">
+                    <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No purchase orders yet</p>
+                    <a href="{% url 'material_management:purchase_order_create' %}" class="btn btn-primary btn-sm">Create First PO</a>
+                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
     
-    <div class="col-md-6 mb-4">
-        <div class="card">
-            <div class="card-header bg-white">
+    <!-- Supplier Performance & Quick Stats -->
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-widget">
+            <div class="chart-toolbar">
                 <h5 class="mb-0">
-                    <i class="fas fa-clipboard-list me-2 text-primary"></i>
-                    Recent Requisitions
+                    <i class="fas fa-truck me-2 text-primary"></i>
+                    Supplier Performance
                 </h5>
             </div>
-            <div class="card-body">
-                {% if requisitions %}
-                    {% for req in requisitions|slice:":5" %}
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                            <h6 class="mb-1">{{ req.req_number }}</h6>
-                            <small class="text-muted">{{ req.project.name }}</small>
+            <div class="p-3">
+                <div class="row g-3 mb-4">
+                    <div class="col-6">
+                        <div class="metric-card text-center">
+                            <h4 class="mb-1 text-success">{{ total_suppliers|default:0 }}</h4>
+                            <small class="text-muted">Total Suppliers</small>
                         </div>
-                        <div class="text-end">
-                            <span class="badge bg-{% if req.status == 'approved' %}success{% elif req.status == 'pending' %}warning{% else %}secondary{% endif %}">
-                                {{ req.get_status_display }}
-                            </span>
+                    </div>
+                    <div class="col-6">
+                        <div class="metric-card text-center">
+                            <h4 class="mb-1 text-warning">{{ avg_delivery_time|default:0 }}</h4>
+                            <small class="text-muted">Avg Delivery (Days)</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="metric-card text-center">
+                            <h4 class="mb-1 text-info">{{ pending_requisitions|default:0 }}</h4>
+                            <small class="text-muted">Pending Reqs</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="metric-card text-center">
+                            <h4 class="mb-1 text-primary">{{ total_materials|default:0 }}</h4>
+                            <small class="text-muted">Total Materials</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h6 class="mb-3">Top Suppliers</h6>
+                    {% for supplier in top_suppliers %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>{{ supplier.name }}</span>
+                        <div class="d-flex align-items-center">
+                            <div class="progress-modern me-2" style="width: 100px;">
+                                <div class="progress-bar-modern" style="--progress-width: {{ supplier.performance_score|default:0 }}%; width: var(--progress-width);"></div>
+                            </div>
+                            <small class="text-muted">{{ supplier.performance_score|default:0 }}%</small>
                         </div>
                     </div>
                     {% endfor %}
-                {% else %}
-                <p class="text-muted text-center">No requisitions yet</p>
-                {% endif %}
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row">
+<!-- Quick Actions -->
+<div class="row mt-4">
     <div class="col-12">
-        <div class="card">
-            <div class="card-header bg-white">
-                <h5 class="mb-0">
-                    <i class="fas fa-tools me-2 text-primary"></i>
-                    Quick Actions
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3 mb-3">
-                        <a href="{% url 'material_management:supplier_create' %}" class="btn btn-primary w-100">
-                            <i class="fas fa-plus me-2"></i>
-                            Add Supplier
+        <div class="dashboard-widget">
+            <div class="p-4 text-center">
+                <h5 class="mb-4">Quick Actions</h5>
+                <div class="row g-3">
+                    <div class="col-lg-3 col-md-6">
+                        <a href="{% url 'material_management:supplier_create' %}" class="btn btn-primary w-100 py-3">
+                            <i class="fas fa-truck fa-2x mb-2 d-block"></i>
+                            <div>Add Supplier</div>
+                            <small class="opacity-75">New supplier</small>
                         </a>
                     </div>
-                    <div class="col-md-3 mb-3">
-                        <a href="{% url 'material_management:material_create' %}" class="btn btn-success w-100">
-                            <i class="fas fa-box me-2"></i>
-                            Add Material
+                    <div class="col-lg-3 col-md-6">
+                        <a href="{% url 'material_management:material_create' %}" class="btn btn-outline-primary w-100 py-3">
+                            <i class="fas fa-box fa-2x mb-2 d-block"></i>
+                            <div>Add Material</div>
+                            <small class="opacity-75">New material</small>
                         </a>
                     </div>
-                    <div class="col-md-3 mb-3">
-                        <a href="{% url 'material_management:purchase_order_create' %}" class="btn btn-warning w-100">
-                            <i class="fas fa-shopping-cart me-2"></i>
-                            Create PO
+                    <div class="col-lg-3 col-md-6">
+                        <a href="{% url 'material_management:purchase_order_create' %}" class="btn btn-outline-success w-100 py-3">
+                            <i class="fas fa-shopping-cart fa-2x mb-2 d-block"></i>
+                            <div>Create PO</div>
+                            <small class="opacity-75">Purchase order</small>
                         </a>
                     </div>
-                    <div class="col-md-3 mb-3">
-                        <a href="{% url 'material_management:requisition_create' %}" class="btn btn-info w-100">
-                            <i class="fas fa-clipboard-list me-2"></i>
-                            Create Requisition
+                    <div class="col-lg-3 col-md-6">
+                        <a href="{% url 'material_management:requisition_create' %}" class="btn btn-outline-info w-100 py-3">
+                            <i class="fas fa-clipboard-list fa-2x mb-2 d-block"></i>
+                            <div>Create Requisition</div>
+                            <small class="opacity-75">Material request</small>
                         </a>
                     </div>
                 </div>
@@ -147,4 +515,309 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Global variables for charts
+let inventoryAnalysisChart, materialCategoriesChart, stockLevelGaugeChart;
+let materialData = null;
+
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        initializeCharts();
+        loadMaterialData();
+        setupEventListeners();
+        animateCounters();
+    } catch (error) {
+        console.error('Error initializing material management dashboard:', error);
+    }
+});
+
+// Initialize all charts
+function initializeCharts() {
+    initializeInventoryAnalysisChart();
+    initializeMaterialCategoriesChart();
+    initializeStockLevelGauge();
+}
+
+// Inventory Analysis Chart
+function initializeInventoryAnalysisChart() {
+    try {
+        const inventoryData = JSON.parse('{{ inventory_analysis_data|escapejs|default:"[]" }}');
+        const ctx = document.getElementById('inventoryAnalysisChart');
+        if (!ctx) {
+            console.error('Inventory analysis chart canvas not found');
+            return;
+        }
+        const chartCtx = ctx.getContext('2d');
+    
+        inventoryAnalysisChart = new Chart(chartCtx, {
+            type: 'line',
+            data: {
+                labels: inventoryData.map(d => d.month),
+                datasets: [{
+                    label: 'Materials Consumed',
+                    data: inventoryData.map(d => d.consumed),
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#ef4444',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                }, {
+                    label: 'Materials Received',
+                    data: inventoryData.map(d => d.received),
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#10b981',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                }, {
+                    label: 'Stock Level',
+                    data: inventoryData.map(d => d.stock_level),
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#2563eb',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: {
+                                size: 12,
+                                weight: '500'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#ffffff',
+                        bodyColor: '#ffffff',
+                        borderColor: '#374151',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 11,
+                                weight: '500'
+                            },
+                            color: '#6b7280'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(107, 114, 128, 0.1)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 11,
+                                weight: '500'
+                            },
+                            color: '#6b7280'
+                        }
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error initializing inventory analysis chart:', error);
+    }
+}
+
+// Material Categories Donut Chart
+function initializeMaterialCategoriesChart() {
+    const categoryData = JSON.parse('{{ material_categories_data|escapejs|default:"[]" }}');
+    const ctx = document.getElementById('materialCategoriesChart').getContext('2d');
+    
+    materialCategoriesChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: categoryData.map(d => d.category),
+            datasets: [{
+                data: categoryData.map(d => d.count),
+                backgroundColor: [
+                    '#2563eb',
+                    '#10b981', 
+                    '#f59e0b',
+                    '#ef4444',
+                    '#8b5cf6',
+                    '#06b6d4'
+                ],
+                borderWidth: 0,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '60%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15,
+                        font: {
+                            size: 11,
+                            weight: '500'
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#ffffff',
+                    bodyColor: '#ffffff',
+                    borderColor: '#374151',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + context.parsed + ' materials';
+                        }
+                    }
+                }
+            },
+            animation: {
+                animateRotate: true,
+                animateScale: true,
+                duration: 1000
+            }
+        }
+    });
+}
+
+// Stock Level Health Gauge
+function initializeStockLevelGauge() {
+    const ctx = document.getElementById('stockLevelGauge').getContext('2d');
+    const healthScore = parseFloat('{{ stock_health_score|floatformat:1|default:0 }}');
+    
+    stockLevelGaugeChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [healthScore, 100 - healthScore],
+                backgroundColor: [
+                    healthScore > 80 ? '#ef4444' : healthScore > 60 ? '#f59e0b' : '#10b981',
+                    '#e5e7eb'
+                ],
+                borderWidth: 0,
+                cutout: '75%'
+            }]
+        },
+        options: {
+            responsive: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            animation: {
+                animateRotate: true,
+                duration: 1500
+            }
+        }
+    });
+}
+
+// Load material data
+function loadMaterialData() {
+    console.log('Material management data loaded');
+}
+
+// Setup event listeners
+function setupEventListeners() {
+    // Chart period controls
+    document.querySelectorAll('.chart-control-btn[data-period]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.chart-control-btn[data-period]').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            console.log('Period changed to:', this.dataset.period);
+        });
+    });
+}
+
+// Animate counters on page load
+function animateCounters() {
+    const counters = document.querySelectorAll('.stat-card-modern h2, .inventory-summary h2');
+    counters.forEach(counter => {
+        const target = parseInt(counter.textContent.replace(/[₹,]/g, ''));
+        const duration = 2000;
+        const increment = target / (duration / 16);
+        let current = 0;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                current = target;
+                clearInterval(timer);
+            }
+            if (counter.textContent.includes('₹')) {
+                counter.textContent = '₹' + Math.floor(current).toLocaleString();
+            } else {
+                counter.textContent = Math.floor(current);
+            }
+        }, 16);
+    });
+}
+
+// Dashboard functions
+function refreshDashboard() {
+    const refreshBtn = event.target;
+    const originalText = refreshBtn.innerHTML;
+    
+    refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Refreshing...';
+    refreshBtn.disabled = true;
+    
+    setTimeout(() => {
+        location.reload();
+    }, 1000);
+}
+
+function exportInventoryReport() {
+    alert('Inventory report export feature coming soon!');
+}
+</script>
 {% endblock %}

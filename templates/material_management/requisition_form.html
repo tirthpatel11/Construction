@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Requisition - Material Management{% endblock %}
+
+{% block page_title %}Create Material Requisition{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">New Requisition</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Project</label>
+                            {{ form.project }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Requested Date</label>
+                            {{ form.requested_date }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Required Date</label>
+                            {{ form.required_date }}
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Remarks</label>
+                            {{ form.remarks }}
+                        </div>
+                    </div>
+                    <div class="mt-4 d-flex justify-content-between">
+                        <a href="{% url 'material_management:requisition_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Create Requisition</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

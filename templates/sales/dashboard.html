@@ -4,161 +4,510 @@
 
 {% block page_title %}Sales Dashboard{% endblock %}
 
+{% block extra_css %}
+<style>
+    .dashboard-widget {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .dashboard-widget:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+    
+    .stat-card-modern {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 20px;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card-modern::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: scale(0);
+        transition: transform 0.6s ease;
+    }
+    
+    .stat-card-modern:hover::before {
+        transform: scale(1);
+    }
+    
+    .stat-card-success {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+    
+    .stat-card-warning {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .stat-card-danger {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .chart-container-modern {
+        position: relative;
+        height: 350px;
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+    
+    .metric-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border-left: 4px solid var(--primary-color);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .metric-card.success {
+        border-left-color: var(--success-color);
+    }
+    
+    .metric-card.warning {
+        border-left-color: var(--warning-color);
+    }
+    
+    .metric-card.danger {
+        border-left-color: var(--danger-color);
+    }
+    
+    .progress-modern {
+        height: 12px;
+        border-radius: 20px;
+        background: linear-gradient(90deg, #e2e8f0 0%, #f1f5f9 100%);
+        overflow: hidden;
+    }
+    
+    .progress-bar-modern {
+        background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+        border-radius: 20px;
+        transition: width 0.8s ease;
+    }
+    
+    .activity-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border-radius: 12px;
+        margin-bottom: 0.5rem;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .activity-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 1.2rem;
+    }
+    
+    .activity-icon.primary {
+        background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+        color: white;
+    }
+    
+    .activity-icon.success {
+        background: linear-gradient(135deg, var(--success-color), #059669);
+        color: white;
+    }
+    
+    .activity-icon.warning {
+        background: linear-gradient(135deg, var(--warning-color), #d97706);
+        color: white;
+    }
+    
+    .chart-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .chart-controls {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .chart-control-btn {
+        padding: 0.5rem 1rem;
+        border: 1px solid #e2e8f0;
+        background: white;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.875rem;
+    }
+    
+    .chart-control-btn:hover,
+    .chart-control-btn.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+    
+    .sales-summary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
+<!-- Welcome Section -->
 <div class="row mb-4">
-    <div class="col-md-3 mb-3">
-        <div class="card stat-card">
-            <div class="card-body text-center">
-                <i class="fas fa-building fa-2x mb-2"></i>
-                <h3 class="mb-1">{{ total_units }}</h3>
-                <p class="mb-0">Total Units</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card stat-card success">
-            <div class="card-body text-center">
-                <i class="fas fa-check-circle fa-2x mb-2"></i>
-                <h3 class="mb-1">{{ sold_units }}</h3>
-                <p class="mb-0">Sold Units</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card stat-card warning">
-            <div class="card-body text-center">
-                <i class="fas fa-bookmark fa-2x mb-2"></i>
-                <h3 class="mb-1">{{ booked_units }}</h3>
-                <p class="mb-0">Booked Units</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card stat-card">
-            <div class="card-body text-center">
-                <i class="fas fa-home fa-2x mb-2"></i>
-                <h3 class="mb-1">{{ available_units }}</h3>
-                <p class="mb-0">Available Units</p>
+    <div class="col-12">
+        <div class="dashboard-widget">
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="mb-2">Sales Overview 🏢</h3>
+                        <p class="text-muted mb-0">Track sales performance, unit bookings, and customer relationships.</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-primary btn-sm" onclick="refreshDashboard()">
+                            <i class="fas fa-sync-alt me-1"></i> Refresh
+                        </button>
+                        <button class="btn btn-primary btn-sm" onclick="exportSalesReport()">
+                            <i class="fas fa-download me-1"></i> Export Report
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Sales Summary -->
 <div class="row mb-4">
-    <div class="col-md-6 mb-3">
-        <div class="card stat-card success">
-            <div class="card-body text-center">
-                <i class="fas fa-dollar-sign fa-2x mb-2"></i>
-                <h3 class="mb-1">${{ total_sales_value|floatformat:0 }}</h3>
-                <p class="mb-0">Total Sales Value</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 mb-3">
-        <div class="card stat-card warning">
-            <div class="card-body text-center">
-                <i class="fas fa-money-bill-wave fa-2x mb-2"></i>
-                <h3 class="mb-1">${{ total_collection|floatformat:0 }}</h3>
-                <p class="mb-0">Total Collection</p>
+    <div class="col-12">
+        <div class="sales-summary">
+            <div class="row text-center">
+                <div class="col-md-3">
+                    <h2 class="mb-1">{{ total_units|default:0 }}</h2>
+                    <p class="mb-0 opacity-75">Total Units</p>
+                </div>
+                <div class="col-md-3">
+                    <h2 class="mb-1">{{ sold_units|default:0 }}</h2>
+                    <p class="mb-0 opacity-75">Sold Units</p>
+                </div>
+                <div class="col-md-3">
+                    <h2 class="mb-1">₹{{ total_sales_value|floatformat:0|default:0 }}</h2>
+                    <p class="mb-0 opacity-75">Sales Value</p>
+                </div>
+                <div class="col-md-3">
+                    <h2 class="mb-1">₹{{ total_collection|floatformat:0|default:0 }}</h2>
+                    <p class="mb-0 opacity-75">Collections</p>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-6 mb-4">
-        <div class="card">
-            <div class="card-header bg-white">
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stat-card-modern">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h2 class="mb-1">{{ total_units|default:0 }}</h2>
+                    <p class="mb-0 opacity-75">Total Units</p>
+                    <small class="opacity-75">
+                        <i class="fas fa-building me-1"></i>
+                        {{ available_units|default:0 }} available
+                    </small>
+                </div>
+                <div class="fs-1 opacity-25">
+                    <i class="fas fa-building"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stat-card-modern stat-card-success">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h2 class="mb-1">{{ sold_units|default:0 }}</h2>
+                    <p class="mb-0 opacity-75">Sold Units</p>
+                    <small class="opacity-75">
+                        <i class="fas fa-check-circle me-1"></i>
+                        {{ sales_conversion_rate|default:0|floatformat:1 }}% conversion
+                    </small>
+                </div>
+                <div class="fs-1 opacity-25">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stat-card-modern stat-card-warning">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h2 class="mb-1">{{ booked_units|default:0 }}</h2>
+                    <p class="mb-0 opacity-75">Booked Units</p>
+                    <small class="opacity-75">
+                        <i class="fas fa-bookmark me-1"></i>
+                        {{ booking_conversion_rate|default:0|floatformat:1 }}% conversion
+                    </small>
+                </div>
+                <div class="fs-1 opacity-25">
+                    <i class="fas fa-bookmark"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stat-card-modern stat-card-danger">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h2 class="mb-1">{{ customers.count|default:0 }}</h2>
+                    <p class="mb-0 opacity-75">Total Customers</p>
+                    <small class="opacity-75">
+                        <i class="fas fa-users me-1"></i>
+                        {{ new_customers_this_month|default:0 }} this month
+                    </small>
+                </div>
+                <div class="fs-1 opacity-25">
+                    <i class="fas fa-users"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <!-- Sales Performance Chart -->
+    <div class="col-lg-8 mb-4">
+        <div class="dashboard-widget">
+            <div class="chart-toolbar">
+                <div>
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line me-2 text-primary"></i>
+                        Sales Performance
+                    </h5>
+                    <small class="text-muted">Monthly sales trends and unit bookings</small>
+                </div>
+                <div class="chart-controls">
+                    <button class="chart-control-btn active" data-period="6m">6M</button>
+                    <button class="chart-control-btn" data-period="1y">1Y</button>
+                    <button class="chart-control-btn" data-period="all">All</button>
+                </div>
+            </div>
+            <div class="chart-container-modern">
+                <canvas id="salesPerformanceChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Unit Status & Revenue Breakdown -->
+    <div class="col-lg-4 mb-4">
+        <div class="dashboard-widget">
+            <div class="chart-toolbar">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-pie me-2 text-primary"></i>
+                    Unit Status
+                </h5>
+            </div>
+            <div class="chart-container-modern">
+                <canvas id="unitStatusChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Revenue Gauge -->
+        <div class="dashboard-widget mt-3">
+            <div class="p-3">
+                <h6 class="mb-3">
+                    <i class="fas fa-gauge me-2 text-warning"></i>
+                    Revenue Target
+                </h6>
+                <div class="text-center">
+                    <div class="position-relative d-inline-block">
+                        <canvas id="revenueGauge" width="120" height="120"></canvas>
+                        <div class="position-absolute top-50 start-50 translate-middle">
+                            <h4 class="mb-0">{{ revenue_achievement|default:0|floatformat:1 }}%</h4>
+                            <small class="text-muted">Achieved</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <small>Revenue Collected</small>
+                        <small>₹{{ total_collection|floatformat:0|default:0 }}</small>
+                    </div>
+                    <div class="progress-modern">
+                        <div class="progress-bar-modern" style="--progress-width: {% if revenue_achievement %}{{ revenue_achievement }}{% else %}0{% endif %}%; width: var(--progress-width);"></div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-1">
+                        <small class="text-muted">Target</small>
+                        <small class="text-muted">₹{{ revenue_target|floatformat:0|default:0 }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activities & Customer Insights -->
+<div class="row mb-4">
+    <!-- Recent Bookings -->
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-widget">
+            <div class="chart-toolbar">
                 <h5 class="mb-0">
                     <i class="fas fa-shopping-cart me-2 text-primary"></i>
                     Recent Bookings
                 </h5>
+                <a href="{% url 'sales:booking_list' %}" class="btn btn-outline-primary btn-sm">View All</a>
             </div>
-            <div class="card-body">
-                {% if bookings %}
-                    {% for booking in bookings|slice:":5" %}
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                            <h6 class="mb-1">{{ booking.booking_number }}</h6>
-                            <small class="text-muted">{{ booking.customer.full_name }} - {{ booking.unit.unit_number }}</small>
-                        </div>
-                        <div class="text-end">
-                            <div class="fw-bold text-success">${{ booking.agreement_value|floatformat:0 }}</div>
+            <div class="p-3">
+                {% for booking in recent_bookings %}
+                <div class="activity-item">
+                    <div class="activity-icon {% if booking.status == 'confirmed' %}success{% elif booking.status == 'draft' %}warning{% else %}primary{% endif %}">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">{{ booking.booking_number }}</h6>
+                        <p class="text-muted mb-1 small">{{ booking.customer.full_name }} - {{ booking.unit.unit_number }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-success">₹{{ booking.agreement_value|floatformat:0|default:0 }}</span>
                             <span class="badge bg-{% if booking.status == 'confirmed' %}success{% elif booking.status == 'draft' %}warning{% else %}secondary{% endif %}">
                                 {{ booking.get_status_display }}
                             </span>
                         </div>
                     </div>
-                    {% endfor %}
-                {% else %}
-                <p class="text-muted text-center">No bookings yet</p>
-                {% endif %}
+                </div>
+                {% empty %}
+                <div class="text-center py-4">
+                    <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No bookings yet</p>
+                    <a href="{% url 'sales:booking_create' %}" class="btn btn-primary btn-sm">Create First Booking</a>
+                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
     
-    <div class="col-md-6 mb-4">
-        <div class="card">
-            <div class="card-header bg-white">
+    <!-- Customer Insights & Quick Stats -->
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-widget">
+            <div class="chart-toolbar">
                 <h5 class="mb-0">
                     <i class="fas fa-users me-2 text-primary"></i>
-                    Recent Customers
+                    Customer Insights
                 </h5>
             </div>
-            <div class="card-body">
-                {% if customers %}
-                    {% for customer in customers|slice:":5" %}
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                            <h6 class="mb-1">{{ customer.full_name }}</h6>
-                            <small class="text-muted">{{ customer.customer_type|title }} - {{ customer.phone }}</small>
+            <div class="p-3">
+                <div class="row g-3 mb-4">
+                    <div class="col-6">
+                        <div class="metric-card text-center">
+                            <h4 class="mb-1 text-success">{{ new_customers_this_month|default:0 }}</h4>
+                            <small class="text-muted">New This Month</small>
                         </div>
-                        <div class="text-end">
-                            <span class="badge bg-primary">{{ customer.bookings.count }} bookings</span>
+                    </div>
+                    <div class="col-6">
+                        <div class="metric-card text-center">
+                            <h4 class="mb-1 text-warning">{{ active_customers|default:0 }}</h4>
+                            <small class="text-muted">Active Customers</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="metric-card text-center">
+                            <h4 class="mb-1 text-info">{{ avg_booking_value|floatformat:0|default:0 }}</h4>
+                            <small class="text-muted">Avg Booking Value</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="metric-card text-center">
+                            <h4 class="mb-1 text-primary">{{ conversion_rate|floatformat:1|default:0 }}%</h4>
+                            <small class="text-muted">Conversion Rate</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h6 class="mb-3">Top Performing Buildings</h6>
+                    {% for building in top_buildings %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>{{ building.name }}</span>
+                        <div class="d-flex align-items-center">
+                            <div class="progress-modern me-2" style="width: 100px;">
+                                <div class="progress-bar-modern" style="--progress-width: {{ building.occupancy_rate|default:0 }}%; width: var(--progress-width);"></div>
+                            </div>
+                            <small class="text-muted">{{ building.occupancy_rate|default:0 }}%</small>
                         </div>
                     </div>
                     {% endfor %}
-                {% else %}
-                <p class="text-muted text-center">No customers yet</p>
-                {% endif %}
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row">
+<!-- Quick Actions -->
+<div class="row mt-4">
     <div class="col-12">
-        <div class="card">
-            <div class="card-header bg-white">
-                <h5 class="mb-0">
-                    <i class="fas fa-tools me-2 text-primary"></i>
-                    Quick Actions
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3 mb-3">
-                        <a href="{% url 'sales:building_create' %}" class="btn btn-primary w-100">
-                            <i class="fas fa-plus me-2"></i>
-                            Add Building
+        <div class="dashboard-widget">
+            <div class="p-4 text-center">
+                <h5 class="mb-4">Quick Actions</h5>
+                <div class="row g-3">
+                    <div class="col-lg-3 col-md-6">
+                        <a href="{% url 'sales:building_create' %}" class="btn btn-primary w-100 py-3">
+                            <i class="fas fa-building fa-2x mb-2 d-block"></i>
+                            <div>Add Building</div>
+                            <small class="opacity-75">New property</small>
                         </a>
                     </div>
-                    <div class="col-md-3 mb-3">
-                        <a href="{% url 'sales:unit_create' %}" class="btn btn-success w-100">
-                            <i class="fas fa-home me-2"></i>
-                            Add Unit
+                    <div class="col-lg-3 col-md-6">
+                        <a href="{% url 'sales:unit_create' %}" class="btn btn-outline-primary w-100 py-3">
+                            <i class="fas fa-home fa-2x mb-2 d-block"></i>
+                            <div>Add Unit</div>
+                            <small class="opacity-75">New salable unit</small>
                         </a>
                     </div>
-                    <div class="col-md-3 mb-3">
-                        <a href="{% url 'sales:customer_create' %}" class="btn btn-warning w-100">
-                            <i class="fas fa-user-plus me-2"></i>
-                            Add Customer
+                    <div class="col-lg-3 col-md-6">
+                        <a href="{% url 'sales:customer_create' %}" class="btn btn-outline-success w-100 py-3">
+                            <i class="fas fa-user-plus fa-2x mb-2 d-block"></i>
+                            <div>Add Customer</div>
+                            <small class="opacity-75">New customer</small>
                         </a>
                     </div>
-                    <div class="col-md-3 mb-3">
-                        <a href="{% url 'sales:booking_create' %}" class="btn btn-info w-100">
-                            <i class="fas fa-shopping-cart me-2"></i>
-                            Create Booking
+                    <div class="col-lg-3 col-md-6">
+                        <a href="{% url 'sales:booking_create' %}" class="btn btn-outline-info w-100 py-3">
+                            <i class="fas fa-shopping-cart fa-2x mb-2 d-block"></i>
+                            <div>Create Booking</div>
+                            <small class="opacity-75">New sale booking</small>
                         </a>
                     </div>
                 </div>
@@ -166,4 +515,311 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Global variables for charts
+let salesPerformanceChart, unitStatusChart, revenueGaugeChart;
+let salesData = null;
+
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        initializeCharts();
+        loadSalesData();
+        setupEventListeners();
+        animateCounters();
+    } catch (error) {
+        console.error('Error initializing sales dashboard:', error);
+    }
+});
+
+// Initialize all charts
+function initializeCharts() {
+    initializeSalesPerformanceChart();
+    initializeUnitStatusChart();
+    initializeRevenueGauge();
+}
+
+// Sales Performance Chart
+function initializeSalesPerformanceChart() {
+    try {
+        const salesData = JSON.parse('{{ sales_performance_data|escapejs|default:"[]" }}');
+        const ctx = document.getElementById('salesPerformanceChart');
+        if (!ctx) {
+            console.error('Sales performance chart canvas not found');
+            return;
+        }
+        const chartCtx = ctx.getContext('2d');
+    
+        salesPerformanceChart = new Chart(chartCtx, {
+            type: 'bar',
+            data: {
+                labels: salesData.map(d => d.month),
+                datasets: [{
+                    label: 'Units Sold',
+                    data: salesData.map(d => d.units_sold),
+                    backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                    borderColor: '#10b981',
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false
+                }, {
+                    label: 'Revenue',
+                    data: salesData.map(d => d.revenue),
+                    backgroundColor: 'rgba(37, 99, 235, 0.8)',
+                    borderColor: '#2563eb',
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: {
+                                size: 12,
+                                weight: '500'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#ffffff',
+                        bodyColor: '#ffffff',
+                        borderColor: '#374151',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function(context) {
+                                if (context.datasetIndex === 0) {
+                                    return context.dataset.label + ': ' + context.parsed.y + ' units';
+                                } else {
+                                    return context.dataset.label + ': ₹' + context.parsed.y.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 11,
+                                weight: '500'
+                            },
+                            color: '#6b7280'
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(107, 114, 128, 0.1)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 11,
+                                weight: '500'
+                            },
+                            color: '#6b7280'
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        beginAtZero: true,
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                        ticks: {
+                            font: {
+                                size: 11,
+                                weight: '500'
+                            },
+                            color: '#6b7280',
+                            callback: function(value) {
+                                return '₹' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error initializing sales performance chart:', error);
+    }
+}
+
+// Unit Status Donut Chart
+function initializeUnitStatusChart() {
+    const unitData = JSON.parse('{{ unit_status_data|escapejs|default:"[]" }}');
+    const ctx = document.getElementById('unitStatusChart').getContext('2d');
+    
+    unitStatusChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: unitData.map(d => d.status),
+            datasets: [{
+                data: unitData.map(d => d.count),
+                backgroundColor: [
+                    '#10b981',
+                    '#f59e0b',
+                    '#ef4444',
+                    '#6b7280'
+                ],
+                borderWidth: 0,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '60%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15,
+                        font: {
+                            size: 11,
+                            weight: '500'
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#ffffff',
+                    bodyColor: '#ffffff',
+                    borderColor: '#374151',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + context.parsed + ' units';
+                        }
+                    }
+                }
+            },
+            animation: {
+                animateRotate: true,
+                animateScale: true,
+                duration: 1000
+            }
+        }
+    });
+}
+
+// Revenue Target Gauge
+function initializeRevenueGauge() {
+    const ctx = document.getElementById('revenueGauge').getContext('2d');
+    const achievement = parseFloat('{{ revenue_achievement|floatformat:1|default:0 }}');
+    
+    revenueGaugeChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [achievement, 100 - achievement],
+                backgroundColor: [
+                    achievement > 80 ? '#ef4444' : achievement > 60 ? '#f59e0b' : '#10b981',
+                    '#e5e7eb'
+                ],
+                borderWidth: 0,
+                cutout: '75%'
+            }]
+        },
+        options: {
+            responsive: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            animation: {
+                animateRotate: true,
+                duration: 1500
+            }
+        }
+    });
+}
+
+// Load sales data
+function loadSalesData() {
+    console.log('Sales data loaded');
+}
+
+// Setup event listeners
+function setupEventListeners() {
+    // Chart period controls
+    document.querySelectorAll('.chart-control-btn[data-period]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.chart-control-btn[data-period]').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            console.log('Period changed to:', this.dataset.period);
+        });
+    });
+}
+
+// Animate counters on page load
+function animateCounters() {
+    const counters = document.querySelectorAll('.stat-card-modern h2, .sales-summary h2');
+    counters.forEach(counter => {
+        const target = parseInt(counter.textContent.replace(/[₹,]/g, ''));
+        const duration = 2000;
+        const increment = target / (duration / 16);
+        let current = 0;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                current = target;
+                clearInterval(timer);
+            }
+            if (counter.textContent.includes('₹')) {
+                counter.textContent = '₹' + Math.floor(current).toLocaleString();
+            } else {
+                counter.textContent = Math.floor(current);
+            }
+        }, 16);
+    });
+}
+
+// Dashboard functions
+function refreshDashboard() {
+    const refreshBtn = event.target;
+    const originalText = refreshBtn.innerHTML;
+    
+    refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Refreshing...';
+    refreshBtn.disabled = true;
+    
+    setTimeout(() => {
+        location.reload();
+    }, 1000);
+}
+
+function exportSalesReport() {
+    alert('Sales report export feature coming soon!');
+}
+</script>
 {% endblock %}

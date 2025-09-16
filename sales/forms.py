@@ -1,7 +1,7 @@
 from django import forms
 from .models import (
     Building, Wing, UnitType, SalableUnit, ParkingUnit, PriceList,
-    Customer, SaleBooking, PaymentSchedule
+    Customer, SaleBooking, PaymentSchedule, Payment
 )
 from projects.models import Project
 
@@ -114,6 +114,22 @@ class PaymentScheduleForm(forms.ModelForm):
 PaymentScheduleFormSet = forms.inlineformset_factory(
     SaleBooking, PaymentSchedule, form=PaymentScheduleForm, extra=1, can_delete=True
 )
+
+
+class PaymentForm(forms.ModelForm):
+    class Meta:
+        model = Payment
+        fields = ['payment_schedule', 'payment_date', 'amount', 'payment_method', 'reference_number', 'bank_name', 'status', 'remarks']
+        widgets = {
+            'payment_schedule': forms.Select(attrs={'class': 'form-select'}),
+            'payment_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'amount': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'placeholder': '0.00'}),
+            'payment_method': forms.Select(attrs={'class': 'form-select'}),
+            'reference_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Reference number'}),
+            'bank_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Bank name'}),
+            'status': forms.Select(attrs={'class': 'form-select'}),
+            'remarks': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Remarks'}),
+        }
 
 
 class PriceListForm(forms.ModelForm):

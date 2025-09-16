@@ -40,10 +40,10 @@
                                         {{ project.get_status_display }}
                                     </span>
                                 </td>
-                                <td>${{ project.estimated_budget|floatformat:2 }}</td>
-                                <td>${{ project.actual_cost|floatformat:2 }}</td>
+                                <td>₹{{ project.estimated_budget|floatformat:2 }}</td>
+                                <td>₹{{ project.actual_cost|floatformat:2 }}</td>
                                 <td class="{% if project.budget_variance < 0 %}text-danger{% else %}text-success{% endif %}">
-                                    ${{ project.budget_variance|floatformat:2 }}
+                                    ₹{{ project.budget_variance|floatformat:2 }}
                                 </td>
                                 <td>
                                     <a href="{% url 'engineering:cost_control_detail' project.id %}" class="btn btn-sm btn-outline-primary">View Details</a>

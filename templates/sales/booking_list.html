@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Sale Bookings - SiteSphere{% endblock %}
+
+{% block page_title %}Sale Bookings{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card dashboard-widget">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-handshake me-2 text-primary"></i>
+                    Sale Bookings
+                </h5>
+                <a href="{% url 'sales:booking_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Create Booking
+                </a>
+            </div>
+            <div class="card-body">
+                {% if bookings %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>Customer</th>
+                                    <th>Unit</th>
+                                    <th>Booking Date</th>
+                                    <th>Agreement Value</th>
+                                    <th>Booking Amount</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in bookings %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-primary">#{{ booking.id }}</span>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>{{ booking.customer.first_name }} {{ booking.customer.last_name }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ booking.customer.email }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>{{ booking.unit.unit_number }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ booking.unit.building.name }} - Floor {{ booking.unit.floor_number }}</small>
+                                        </div>
+                                    </td>
+                                    <td>{{ booking.booking_date|date:"M d, Y" }}</td>
+                                    <td>₹{{ booking.agreement_value|floatformat:0 }}</td>
+                                    <td>₹{{ booking.booking_amount|floatformat:0 }}</td>
+                                    <td>
+                                        {% if booking.status == 'active' %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% elif booking.status == 'cancelled' %}
+                                            <span class="badge bg-danger">Cancelled</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'sales:booking_detail' booking.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'sales:booking_edit' booking.id %}" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form method="post" action="{% url 'sales:booking_delete' booking.id %}" onsubmit="return confirm('Delete booking #{{ booking.id }}?');">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-handshake fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No bookings found</h5>
+                        <p class="text-muted">Start by creating your first sale booking.</p>
+                        <a href="{% url 'sales:booking_create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Create First Booking
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

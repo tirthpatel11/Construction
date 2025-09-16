@@ -58,12 +58,19 @@ def home(request):
     
     cash_flow_data.reverse()
     
-    # Cost breakdown data
-    cost_breakdown = ProjectExpense.objects.filter(
+    # Cost breakdown data (coerce Decimal -> float for JSON)
+    cost_breakdown_qs = ProjectExpense.objects.filter(
         project__in=user_projects
     ).values('category').annotate(
         total=Sum('amount')
     ).order_by('-total')
+    cost_breakdown = [
+        {
+            'category': row['category'],
+            'total': float(row['total'] or 0)
+        }
+        for row in cost_breakdown_qs
+    ]
     
     context = {
         'total_projects': total_projects,
@@ -75,7 +82,7 @@ def home(request):
         'recent_projects': recent_projects,
         'upcoming_payments': upcoming_payments,
         'cash_flow_data': json.dumps(cash_flow_data),
-        'cost_breakdown': json.dumps(list(cost_breakdown)),
+        'cost_breakdown': json.dumps(cost_breakdown),
     }
     
     return render(request, 'dashboard/home.html', context)
@@ -107,20 +114,59 @@ def analytics_data(request):
             'status': project.status
         })
     
-    # Resource utilization (mock data for heatmap)
+    # Resource utilization (real data based on project expenses)
     resource_data = []
     resources = ['Labor', 'Materials', 'Equipment', 'Subcontractors']
     months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
     
+    # Get actual expense data for resource utilization
     for resource in resources:
-        for month in months:
+        for i, month in enumerate(months):
+            # Calculate utilization based on actual expenses
+            month_start = timezone.now().replace(day=1) - timedelta(days=30*(5-i))
+            month_end = month_start + timedelta(days=30)
+            
+            # Map resource categories to expense categories
+            category_mapping = {
+                'Labor': 'labor',
+                'Materials': 'materials', 
+                'Equipment': 'equipment',
+                'Subcontractors': 'subcontractor'
+            }
+            
+            expenses = ProjectExpense.objects.filter(
+                project__in=user_projects,
+                category=category_mapping[resource],
+                date__range=[month_start, month_end]
+            ).aggregate(Sum('amount'))['amount__sum'] or 0
+            
+            # Calculate utilization percentage (assuming max budget per resource per month)
+            max_budget = 50000  # This could be made dynamic based on project budgets
+            utilization = min(100, (float(expenses) / max_budget) * 100) if max_budget > 0 else 0
+            
             resource_data.append({
                 'resource': resource,
                 'month': month,
-                'utilization': __import__('random').randint(20, 100)
+                'utilization': round(utilization, 1)
             })
     
     return JsonResponse({
         'completion_data': completion_data,
         'resource_data': resource_data,
     })
+
+
+@login_required
+def settings_view(request):
+    """Simple settings page storing preferences in session."""
+    if request.method == 'POST':
+        theme = request.POST.get('theme', 'light')
+        currency = request.POST.get('currency', 'INR')
+        request.session['ui_theme'] = theme
+        request.session['currency'] = currency
+        return redirect('dashboard:settings')
+    context = {
+        'theme': request.session.get('ui_theme', 'light'),
+        'currency': request.session.get('currency', 'INR'),
+    }
+    return render(request, 'dashboard/settings.html', context)

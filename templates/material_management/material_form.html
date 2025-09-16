@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Material - Material Management{% endblock %}
+
+{% block page_title %}Add Material{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Add New Material</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Code</label>
+                            {{ form.code }}
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Name</label>
+                            {{ form.name }}
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Description</label>
+                            {{ form.description }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Category</label>
+                            {{ form.category }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Unit</label>
+                            {{ form.unit }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Standard Rate</label>
+                            {{ form.standard_rate }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Reorder Level</label>
+                            {{ form.reorder_level }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Reorder Quantity</label>
+                            {{ form.reorder_quantity }}
+                        </div>
+                    </div>
+                    <div class="mt-4 d-flex justify-content-between">
+                        <a href="{% url 'material_management:material_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save Material</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

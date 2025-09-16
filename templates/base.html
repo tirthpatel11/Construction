@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+{% with theme=request.session.ui_theme|default:'light' %}
+<html lang="en" class="{% if theme == 'dark' %}theme-dark{% endif %}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,6 +16,38 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     
     <style>
+        {% with theme=request.session.ui_theme|default:'light' %}
+        {% if theme == 'dark' %}
+        :root {
+            --primary-color: #60a5fa;
+            --secondary-color: #94a3b8;
+            --success-color: #34d399;
+            --warning-color: #fbbf24;
+            --danger-color: #f87171;
+            --dark-color: #0f172a;
+            --light-color: #0b1220;
+        }
+        body.theme-dark { background-color: var(--light-color); color: #e2e8f0; }
+        body.theme-dark .card { background-color: #111827; color: #e2e8f0; }
+        body.theme-dark .sidebar { background: linear-gradient(135deg, #0b1220 0%, #111827 100%); }
+        body.theme-dark .table { color: #e5e7eb; }
+        body.theme-dark .table thead th { background-color: #111827; color: #e5e7eb; }
+        body.theme-dark .form-control, body.theme-dark .form-select { background-color: #0b1220; color: #e5e7eb; border-color: #334155; }
+        body.theme-dark .form-control::placeholder { color: #64748b; }
+        body.theme-dark .btn-outline-secondary { color: #e5e7eb; border-color: #475569; }
+        body.theme-dark .btn-outline-secondary:hover { background-color: #1f2937; }
+        body.theme-dark .dropdown-menu { background-color: #111827; color: #e5e7eb; }
+        body.theme-dark .dropdown-item { color: #e5e7eb; }
+        body.theme-dark .dropdown-item:hover { background-color: #1f2937; }
+        body.theme-dark .text-muted { color: #9ca3af !important; }
+        body.theme-dark .table-light { background-color: #1f2937; }
+        body.theme-dark .bg-white { background-color: #111827 !important; }
+        body.theme-dark .navbar-brand { color: var(--primary-color) !important; }
+        body.theme-dark .btn-close { filter: invert(1); }
+        .table thead th { background-color: #1f2937; }
+        .heatmap-container { background: #111827; }
+        {% endif %}
+        {% endwith %}
         :root {
             --primary-color: #2563eb;
             --secondary-color: #64748b;
@@ -191,7 +224,7 @@
     
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="{% if theme == 'dark' %}theme-dark{% endif %}">
     {% if user.is_authenticated %}
     <div class="container-fluid">
         <div class="row">
@@ -232,7 +265,7 @@
                                 <i class="fas fa-chart-bar me-2"></i>
                                 Reports
                             </a>
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="{% url 'dashboard:settings' %}">
                                 <i class="fas fa-cog me-2"></i>
                                 Settings
                             </a>
@@ -263,7 +296,7 @@
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
-                                    <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'dashboard:settings' %}"><i class="fas fa-cog me-2"></i>Settings</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="{% url 'authentication:logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                                 </ul>
@@ -298,3 +331,4 @@
     {% block extra_js %}{% endblock %}
 </body>
 </html>
+{% endwith %}

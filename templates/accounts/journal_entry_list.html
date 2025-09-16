@@ -43,8 +43,8 @@
                                 <td>{{ entry.entry_date|date:"M d, Y" }}</td>
                                 <td>{{ entry.description|truncatechars:50 }}</td>
                                 <td>{{ entry.project.name|default:"-" }}</td>
-                                <td>${{ entry.total_debit|floatformat:2 }}</td>
-                                <td>${{ entry.total_credit|floatformat:2 }}</td>
+                                <td>₹{{ entry.total_debit|floatformat:2 }}</td>
+                                <td>₹{{ entry.total_credit|floatformat:2 }}</td>
                                 <td>
                                     <span class="badge bg-{% if entry.is_posted %}success{% else %}warning{% endif %}">
                                         {% if entry.is_posted %}Posted{% else %}Draft{% endif %}

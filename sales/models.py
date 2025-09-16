@@ -152,6 +152,46 @@ class Customer(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
+    def save(self, *args, **kwargs):
+        if not self.customer_id:
+            # Generate customer ID: CUST + 6-digit number
+            # Use a more robust method to avoid race conditions
+            import time
+            max_attempts = 10
+            for attempt in range(max_attempts):
+                try:
+                    # Get the highest customer ID number
+                    last_customer = Customer.objects.filter(
+                        customer_id__startswith='CUST'
+                    ).order_by('-customer_id').first()
+                    
+                    if last_customer and last_customer.customer_id:
+                        try:
+                            last_number = int(last_customer.customer_id.replace('CUST', ''))
+                            next_number = last_number + 1
+                        except (ValueError, AttributeError):
+                            next_number = 1
+                    else:
+                        next_number = 1
+                    
+                    self.customer_id = f"CUST{next_number:06d}"
+                    
+                    # Try to save, if it fails due to unique constraint, try next number
+                    super().save(*args, **kwargs)
+                    break
+                    
+                except Exception as e:
+                    if 'UNIQUE constraint failed' in str(e) and attempt < max_attempts - 1:
+                        # If unique constraint failed, try next number
+                        next_number += 1
+                        self.customer_id = f"CUST{next_number:06d}"
+                        time.sleep(0.1)  # Small delay to avoid rapid retries
+                        continue
+                    else:
+                        raise e
+        else:
+            super().save(*args, **kwargs)
+    
     def __str__(self):
         if self.customer_type == 'company':
             return f"{self.company_name} ({self.customer_id})"
@@ -184,8 +224,29 @@ class SaleBooking(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
+    def save(self, *args, **kwargs):
+        if not self.booking_number:
+            # Generate booking number: BK + 6-digit number
+            last_booking = SaleBooking.objects.order_by('-id').first()
+            if last_booking and last_booking.booking_number:
+                try:
+                    last_number = int(last_booking.booking_number.replace('BK', ''))
+                    next_number = last_number + 1
+                except (ValueError, AttributeError):
+                    next_number = 1
+            else:
+                next_number = 1
+            self.booking_number = f"BK{next_number:06d}"
+        super().save(*args, **kwargs)
+    
     def __str__(self):
         return f"Booking-{self.booking_number} - {self.customer.full_name}"
+    
+    @property
+    def booking_percentage(self):
+        if self.agreement_value > 0:
+            return (self.booking_amount / self.agreement_value) * 100
+        return 0
     
     @property
     def outstanding_amount(self):

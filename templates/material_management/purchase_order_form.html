@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Purchase Order - Material Management{% endblock %}
+
+{% block page_title %}Create Purchase Order{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">New Purchase Order</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Project</label>
+                            {{ form.project }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Supplier</label>
+                            {{ form.supplier }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">PO Date</label>
+                            {{ form.po_date }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Expected Delivery</label>
+                            {{ form.expected_delivery_date }}
+                        </div>
+                    </div>
+                    <div class="mt-4 d-flex justify-content-between">
+                        <a href="{% url 'material_management:purchase_order_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Create PO</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

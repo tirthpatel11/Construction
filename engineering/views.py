@@ -13,16 +13,95 @@ from .forms import EstimationForm, EstimationItemFormSet, BudgetForm, BudgetItem
 @login_required
 def dashboard(request):
     """Engineering dashboard"""
+    from django.db.models import Sum, Count, Avg
+    from django.utils import timezone
+    from datetime import timedelta
+    
     projects = Project.objects.filter(created_by=request.user)
     estimations = Estimation.objects.filter(project__created_by=request.user, is_active=True)
     budgets = ProjectBudget.objects.filter(project__created_by=request.user)
     schedules = ProjectSchedule.objects.filter(project__created_by=request.user)
     
+    # Calculate statistics
+    total_estimation_value = float(estimations.aggregate(Sum('total_estimated_cost'))['total_estimated_cost__sum'] or 0)
+    total_budget_value = float(budgets.aggregate(Sum('total_budget'))['total_budget__sum'] or 0)
+    active_projects = projects.filter(status='active').count()
+    
+    # Schedule statistics
+    total_activities = ScheduleActivity.objects.filter(schedule__project__created_by=request.user).count()
+    completed_activities = ScheduleActivity.objects.filter(
+        schedule__project__created_by=request.user, 
+        completion_percentage=100
+    ).count()
+    schedule_progress = float((completed_activities / total_activities * 100) if total_activities > 0 else 0)
+    
+    # Recent data
+    recent_projects = projects.order_by('-created_at')[:5]
+    recent_estimations = estimations.order_by('-created_at')[:5]
+    recent_budgets = budgets.order_by('-created_at')[:5]
+    
+    # Cost analysis data for charts - using real project data
+    cost_analysis_data = []
+    for project in projects[:5]:  # Top 5 projects
+        project_estimations = estimations.filter(project=project)
+        project_budgets = budgets.filter(project=project)
+        
+        # Get estimated cost from estimations
+        estimated_cost = project_estimations.aggregate(Sum('total_estimated_cost'))['total_estimated_cost__sum'] or 0
+        
+        # Get actual cost from project expenses and budgets
+        project_expenses = project.expenses.aggregate(Sum('amount'))['amount__sum'] or 0
+        budget_actual = project_budgets.aggregate(Sum('total_budget'))['total_budget__sum'] or 0
+        actual_cost = max(project_expenses, budget_actual)  # Use the higher value
+        
+        if estimated_cost > 0 or actual_cost > 0:  # Only include projects with data
+            cost_analysis_data.append({
+                'project_name': project.name[:20] + '...' if len(project.name) > 20 else project.name,
+                'estimated_cost': float(estimated_cost),
+                'actual_cost': float(actual_cost)
+            })
+    
+    # Budget utilization data - using real expense categories
+    expense_categories = ['materials', 'labor', 'equipment', 'permits', 'utilities', 'subcontractor', 'other']
+    budget_utilization_data = []
+    
+    for category in expense_categories:
+        category_expenses = sum([
+            project.expenses.filter(category=category).aggregate(Sum('amount'))['amount__sum'] or 0
+            for project in projects
+        ])
+        if category_expenses > 0:
+            budget_utilization_data.append({
+                'category': category.title(),
+                'amount': float(category_expenses)
+            })
+    
+    # If no real data, show default distribution
+    if not budget_utilization_data and total_budget_value > 0:
+        budget_utilization_data = [
+            {'category': 'Labor', 'amount': float(total_budget_value * 0.4)},
+            {'category': 'Materials', 'amount': float(total_budget_value * 0.35)},
+            {'category': 'Equipment', 'amount': float(total_budget_value * 0.15)},
+            {'category': 'Overhead', 'amount': float(total_budget_value * 0.1)}
+        ]
+    
+    import json
     context = {
         'projects': projects,
         'estimations': estimations,
         'budgets': budgets,
         'schedules': schedules,
+        'total_estimation_value': total_estimation_value,
+        'total_budget_value': total_budget_value,
+        'active_projects': active_projects,
+        'total_activities': total_activities,
+        'completed_activities': completed_activities,
+        'schedule_progress': schedule_progress,
+        'recent_projects': recent_projects,
+        'recent_estimations': recent_estimations,
+        'recent_budgets': recent_budgets,
+        'cost_analysis_data': json.dumps(cost_analysis_data),
+        'budget_utilization_data': json.dumps(budget_utilization_data),
     }
     
     return render(request, 'engineering/dashboard.html', context)
