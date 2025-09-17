@@ -4,7 +4,7 @@ supabase==2.3.4
 python-dotenv==1.0.1
 Pillow>=11.0.0,<12
 django-cors-headers==4.6.0
-psycopg2-binary==2.9.10
-dj-database-url==2.2.0
+gunicorn==22.0.0
 whitenoise==6.7.0
-gunicorn
+dj-database-url==2.2.0
+psycopg[binary]==3.2.3
