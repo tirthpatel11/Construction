@@ -7,6 +7,11 @@ services:
       pip install -r requirements.txt
       cd frontend && npm ci && npm run build && cd ..
       python manage.py collectstatic --noinput
+    postdeployCommand: |
+      python manage.py migrate --noinput
+      if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ]; then
+        python manage.py createsuperuser --noinput || true
+      fi
     startCommand: gunicorn sitesphere.wsgi:application --log-file -
     envVars:
       - key: SECRET_KEY
@@ -21,6 +26,12 @@ services:
         fromDatabase:
           name: erp-db
           property: connectionString
+      - key: DJANGO_SUPERUSER_USERNAME
+        value: admin
+      - key: DJANGO_SUPERUSER_EMAIL
+        value: admin@example.com
+      - key: DJANGO_SUPERUSER_PASSWORD
+        sync: false
 
 databases:
   - name: erp-db
