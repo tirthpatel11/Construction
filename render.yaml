@@ -7,7 +7,7 @@ services:
       pip install -r requirements.txt
       cd frontend && npm ci && npm run build && cd ..
       python manage.py collectstatic --noinput
-    postdeployCommand: |
+    postDeployCommand: |
       python manage.py migrate --noinput
       if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ]; then
         python manage.py createsuperuser --noinput || true
