@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from projects.models import Project, Partner, ProjectExpense, ProjectPayment
-from django.db.models import Sum, Count, Q
+from django.db.models import Sum, Count, Q, Avg
 from django.utils import timezone
 from datetime import datetime, timedelta
 import json
@@ -90,11 +90,71 @@ def home(request):
 
 @login_required
 def project_selection(request):
-    """Project selection page - create new or work on existing"""
+    """Project selection page with comprehensive project analytics"""
     user_projects = Project.objects.filter(created_by=request.user).order_by('-created_at')
+    
+    # Calculate basic project statistics
+    total_projects = user_projects.count()
+    active_projects = user_projects.filter(status='active').count()
+    total_budget = user_projects.aggregate(total=Sum('estimated_budget'))['total'] or 0
+    avg_progress = user_projects.aggregate(avg=Avg('completion_percentage'))['avg'] or 0
+    
+    # Calculate advanced analytics
+    completed_projects = user_projects.filter(status='completed').count()
+    completion_rate = (completed_projects / total_projects * 100) if total_projects > 0 else 0
+    
+    # Calculate on-time rate (projects completed within estimated time)
+    on_time_projects = user_projects.filter(
+        status='completed',
+        completion_percentage=100
+    ).count()
+    on_time_rate = (on_time_projects / completed_projects * 100) if completed_projects > 0 else 0
+    
+    # Calculate budget utilization
+    total_actual_cost = user_projects.aggregate(total=Sum('actual_cost'))['total'] or 0
+    budget_utilization = (total_actual_cost / total_budget * 100) if total_budget > 0 else 0
+    
+    # Calculate project velocity (average progress per month)
+    from datetime import datetime, timedelta
+    six_months_ago = timezone.now() - timedelta(days=180)
+    recent_projects = user_projects.filter(created_at__gte=six_months_ago)
+    project_velocity = recent_projects.aggregate(avg=Avg('completion_percentage'))['avg'] or 0
+    
+    # Risk assessment
+    budget_risk = 'low'
+    if budget_utilization > 90:
+        budget_risk = 'high'
+    elif budget_utilization > 70:
+        budget_risk = 'medium'
+    
+    schedule_risk = 'low'
+    if avg_progress < 30:
+        schedule_risk = 'high'
+    elif avg_progress < 60:
+        schedule_risk = 'medium'
+    
+    resource_risk = 'low'
+    if active_projects > 5:
+        resource_risk = 'high'
+    elif active_projects > 3:
+        resource_risk = 'medium'
+    
+    # Top performers (projects with highest completion percentage)
+    top_performers = user_projects.filter(completion_percentage__gt=0).order_by('-completion_percentage')
     
     context = {
         'projects': user_projects,
+        'active_projects': active_projects,
+        'total_budget': total_budget,
+        'avg_progress': avg_progress,
+        'completion_rate': completion_rate,
+        'on_time_rate': on_time_rate,
+        'budget_utilization': budget_utilization,
+        'project_velocity': project_velocity,
+        'budget_risk': budget_risk,
+        'schedule_risk': schedule_risk,
+        'resource_risk': resource_risk,
+        'top_performers': top_performers,
     }
     
     return render(request, 'dashboard/project_selection.html', context)

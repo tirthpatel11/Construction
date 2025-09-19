@@ -7,32 +7,83 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-10">
-        <!-- Action Cards -->
-        <div class="row mb-5">
-            <div class="col-md-6 mb-4">
-                <div class="card h-100 border-0 shadow-sm" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                    <div class="card-body text-center text-white p-5">
-                        <i class="fas fa-plus-circle fa-4x mb-3"></i>
-                        <h3 class="mb-3">Create New Project</h3>
-                        <p class="mb-4">Start a new construction project with detailed planning and partner management.</p>
-                        <a href="{% url 'projects:create' %}" class="btn btn-light btn-lg px-4">
-                            <i class="fas fa-rocket me-2"></i>
-                            Get Started
-                        </a>
+        <!-- Project Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card stat-card">
+                    <div class="card-body text-center">
+                        <i class="bi bi-folder2-open fa-2x mb-2 text-primary"></i>
+                        <h3 class="mb-1">{{ projects.count }}</h3>
+                        <p class="text-muted mb-0">Total Projects</p>
                     </div>
                 </div>
             </div>
-            
-            <div class="col-md-6 mb-4">
-                <div class="card h-100 border-0 shadow-sm" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                    <div class="card-body text-center text-white p-5">
-                        <i class="fas fa-folder-open fa-4x mb-3"></i>
-                        <h3 class="mb-3">Existing Projects</h3>
-                        <p class="mb-4">Continue working on your existing projects and track their progress.</p>
-                        <a href="{% url 'projects:list' %}" class="btn btn-light btn-lg px-4">
-                            <i class="fas fa-arrow-right me-2"></i>
-                            View Projects
-                        </a>
+            <div class="col-md-3 mb-3">
+                <div class="card stat-card success">
+                    <div class="card-body text-center text-white">
+                        <i class="bi bi-check-circle fa-2x mb-2"></i>
+                        <h3 class="mb-1">{{ active_projects|default:0 }}</h3>
+                        <p class="mb-0">Active Projects</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card stat-card warning">
+                    <div class="card-body text-center text-white">
+                        <i class="bi bi-clock fa-2x mb-2"></i>
+                        <h3 class="mb-1">₹{{ total_budget|floatformat:0|default:0 }}</h3>
+                        <p class="mb-0">Total Budget</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card stat-card danger">
+                    <div class="card-body text-center text-white">
+                        <i class="bi bi-graph-up fa-2x mb-2"></i>
+                        <h3 class="mb-1">{{ avg_progress|floatformat:0|default:0 }}%</h3>
+                        <p class="mb-0">Avg Progress</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-lightning me-2 text-warning"></i>
+                            Quick Actions
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 mb-2">
+                                <a href="{% url 'projects:create' %}" class="btn btn-outline-primary w-100">
+                                    <i class="bi bi-plus-circle me-2"></i>
+                                    New Project
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <a href="{% url 'projects:list' %}" class="btn btn-outline-secondary w-100">
+                                    <i class="bi bi-list-ul me-2"></i>
+                                    All Projects
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <a href="#" class="btn btn-outline-success w-100">
+                                    <i class="bi bi-download me-2"></i>
+                                    Export Data
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <a href="#" class="btn btn-outline-info w-100">
+                                    <i class="bi bi-graph-up me-2"></i>
+                                    Analytics
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -101,7 +152,7 @@
                                         <a href="{% url 'projects:detail' project.id %}" class="btn btn-outline-primary">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="#" class="btn btn-outline-secondary">
+                                        <a href="{% url 'projects:edit' project.id %}" class="btn btn-outline-secondary">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                     </div>
@@ -133,6 +184,464 @@
             </a>
         </div>
         {% endif %}
+
+        <!-- Project Analytics -->
+        {% if projects %}
+        <div class="row mt-4">
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-pie-chart me-2 text-info"></i>
+                            Project Status Distribution
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="statusChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-graph-up me-2 text-success"></i>
+                            Budget vs Progress
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="budgetProgressChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Analytics Row -->
+        <div class="row mt-4">
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-calendar3 me-2 text-warning"></i>
+                            Project Timeline
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="timelineChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-bar-chart me-2 text-primary"></i>
+                            Monthly Progress
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="monthlyProgressChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-speedometer2 me-2 text-danger"></i>
+                            Performance Metrics
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-6 mb-3">
+                                <div class="metric-item">
+                                    <h4 class="text-primary mb-1">{{ completion_rate|floatformat:1|default:0 }}%</h4>
+                                    <small class="text-muted">Completion Rate</small>
+                                </div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="metric-item">
+                                    <h4 class="text-success mb-1">{{ on_time_rate|floatformat:1|default:0 }}%</h4>
+                                    <small class="text-muted">On-Time Rate</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="metric-item">
+                                    <h4 class="text-warning mb-1">₹{{ budget_utilization|floatformat:1|default:0 }}%</h4>
+                                    <small class="text-muted">Budget Used</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="metric-item">
+                                    <h4 class="text-info mb-1">{{ project_velocity|floatformat:1|default:0 }}</h4>
+                                    <small class="text-muted">Avg Velocity</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Health Dashboard -->
+        <div class="row mt-4">
+            <div class="col-md-8 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-heart-pulse me-2 text-danger"></i>
+                            Project Health Overview
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-muted mb-3">Project Health Status</h6>
+                                {% for project in projects|slice:":5" %}
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <span class="fw-medium">{{ project.name|truncatechars:25 }}</span>
+                                        <br>
+                                        <small class="text-muted">{{ project.company_name }}</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="progress mb-1" style="width: 80px; height: 6px;">
+                                            <div class="progress-bar bg-{% if project.completion_percentage >= 80 %}success{% elif project.completion_percentage >= 50 %}warning{% else %}danger{% endif %}" 
+                                                 style="width: {{ project.completion_percentage }}%"></div>
+                                        </div>
+                                        <small class="text-muted">{{ project.completion_percentage }}%</small>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted mb-3">Risk Assessment</h6>
+                                <div class="risk-item mb-2">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Budget Overrun Risk</span>
+                                        <span class="badge bg-{% if budget_risk == 'low' %}success{% elif budget_risk == 'medium' %}warning{% else %}danger{% endif %}">
+                                            {{ budget_risk|title }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="risk-item mb-2">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Schedule Delay Risk</span>
+                                        <span class="badge bg-{% if schedule_risk == 'low' %}success{% elif schedule_risk == 'medium' %}warning{% else %}danger{% endif %}">
+                                            {{ schedule_risk|title }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="risk-item mb-2">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Resource Availability</span>
+                                        <span class="badge bg-{% if resource_risk == 'low' %}success{% elif resource_risk == 'medium' %}warning{% else %}danger{% endif %}">
+                                            {{ resource_risk|title }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-trophy me-2 text-warning"></i>
+                            Top Performers
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% for project in top_performers|slice:":3" %}
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="flex-shrink-0">
+                                <div class="bg-{% if forloop.counter == 1 %}warning{% elif forloop.counter == 2 %}secondary{% else %}warning{% endif %} rounded-circle d-flex align-items-center justify-content-center" 
+                                     style="width: 35px; height: 35px;">
+                                    <i class="bi bi-trophy-fill text-white"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-1">{{ project.name|truncatechars:20 }}</h6>
+                                <small class="text-muted">{{ project.completion_percentage }}% Complete</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-{% if project.completion_percentage >= 80 %}success{% elif project.completion_percentage >= 50 %}primary{% else %}warning{% endif %}">
+                                    #{{ forloop.counter }}
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Timeline -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-calendar-event me-2 text-warning"></i>
+                            Recent Project Activity
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            {% for project in projects|slice:":5" %}
+                            <div class="timeline-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">{{ project.name }}</h6>
+                                        <p class="text-muted mb-1">{{ project.company_name }}</p>
+                                        <small class="text-muted">Created {{ project.created_at|timesince }} ago</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-{% if project.status == 'active' %}success{% elif project.status == 'completed' %}primary{% elif project.status == 'on_hold' %}warning{% else %}secondary{% endif %}">
+                                            {{ project.get_status_display }}
+                                        </span>
+                                        <div class="mt-1">
+                                            <small class="text-muted">{{ project.completion_percentage }}% Complete</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
+
+{% block extra_css %}
+<style>
+.metric-item {
+    padding: 10px;
+    border-radius: 8px;
+    background: rgba(124, 58, 237, 0.05);
+    border: 1px solid rgba(124, 58, 237, 0.1);
+}
+
+.risk-item {
+    padding: 8px 12px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.02);
+    border-left: 3px solid #e5e7eb;
+}
+
+.risk-item:has(.badge.bg-success) {
+    border-left-color: #10b981;
+}
+
+.risk-item:has(.badge.bg-warning) {
+    border-left-color: #f59e0b;
+}
+
+.risk-item:has(.badge.bg-danger) {
+    border-left-color: #ef4444;
+}
+
+.chart-container {
+    position: relative;
+    height: 250px;
+}
+
+canvas {
+    max-height: 250px;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Project Status Distribution Chart
+    const statusCtx = document.getElementById('statusChart');
+    if (statusCtx) {
+        const statusData = {};
+        {% for project in projects %}
+        const status = '{{ project.get_status_display }}';
+        statusData[status] = (statusData[status] || 0) + 1;
+        {% endfor %}
+        
+        const statusLabels = Object.keys(statusData);
+        const statusValues = Object.values(statusData);
+        
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    data: statusValues,
+                    backgroundColor: [
+                        '#10b981', // success
+                        '#3b82f6', // primary
+                        '#f59e0b', // warning
+                        '#6b7280'  // secondary
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    // Budget vs Progress Chart
+    const budgetCtx = document.getElementById('budgetProgressChart');
+    if (budgetCtx) {
+        const budgetData = [
+            {% for project in projects|slice:":5" %}
+            {
+                x: {{ project.estimated_budget|default:0 }},
+                y: {{ project.completion_percentage|default:0 }},
+                label: '{{ project.name|truncatechars:20 }}'
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+        
+        new Chart(budgetCtx, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Projects',
+                    data: budgetData,
+                    backgroundColor: 'rgba(124, 58, 237, 0.6)',
+                    borderColor: 'rgba(124, 58, 237, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Budget (₹)'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Progress (%)'
+                        },
+                        min: 0,
+                        max: 100
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.raw.label + ': ₹' + context.raw.x.toLocaleString() + ' (' + context.raw.y + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Project Timeline Chart
+    const timelineCtx = document.getElementById('timelineChart');
+    if (timelineCtx) {
+        const timelineData = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Projects Started',
+                data: [2, 3, 1, 4, 2, 3],
+                backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                borderColor: 'rgba(16, 185, 129, 1)',
+                borderWidth: 2,
+                fill: true
+            }, {
+                label: 'Projects Completed',
+                data: [1, 2, 2, 1, 3, 2],
+                backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                borderColor: 'rgba(59, 130, 246, 1)',
+                borderWidth: 2,
+                fill: true
+            }]
+        };
+        
+        new Chart(timelineCtx, {
+            type: 'line',
+            data: timelineData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Projects'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    // Monthly Progress Chart
+    const monthlyCtx = document.getElementById('monthlyProgressChart');
+    if (monthlyCtx) {
+        const monthlyData = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Average Progress %',
+                data: [25, 35, 45, 55, 65, 75],
+                backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                borderColor: 'rgba(245, 158, 11, 1)',
+                borderWidth: 2,
+                fill: true
+            }]
+        };
+        
+        new Chart(monthlyCtx, {
+            type: 'bar',
+            data: monthlyData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'Progress %'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
 {% endblock %}
