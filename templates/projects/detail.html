@@ -4,6 +4,23 @@
 
 {% block page_title %}{{ project.name }}{% endblock %}
 
+{% block extra_css %}
+<style>
+/* Tighten the analysis card spacing and force canvas to use full container */
+.project-analytics .card-body{padding:12px 12px 8px 12px}
+.project-analytics .chart-container{height:180px;margin:0}
+#budgetChart{display:block !important;width:100% !important;height:100% !important}
+#progressSpark{display:block !important;width:100% !important}
+.projects-analytics-row > [class*="col-"]{align-self:flex-start}
+.projects-analytics-row{align-items:flex-start !important}
+.projects-analytics-row .card{height:auto}
+.project-analytics .card{height:auto}
+.project-analytics .card-body{display:flex;flex-direction:column}
+.project-analytics .chart-container{flex:0 0 280px}
+.project-analytics .spark-wrap{flex:0 0 auto}
+</style>
+{% endblock %}
+
 {% block content %}
 <!-- Project Header -->
 <div class="row mb-4">
@@ -100,9 +117,9 @@
 </div>
 
 <!-- Charts and Analytics -->
-<div class="row mb-4">
+<div class="row mb-4 projects-analytics-row" style="align-items:flex-start;">
     <!-- Project Timeline -->
-    <div class="col-md-6 mb-3">
+    <div class="col-md-6 mb-3 project-analytics">
         <div class="card">
             <div class="card-header bg-white">
                 <h5 class="mb-0">
@@ -134,7 +151,7 @@
     </div>
     
     <!-- Budget vs Actual Chart -->
-    <div class="col-md-6 mb-3">
+    <div class="col-md-6 mb-3 project-analytics">
         <div class="card">
             <div class="card-header bg-white">
                 <h5 class="mb-0">
@@ -142,13 +159,13 @@
                     Progress Trend & Budget Analysis
                 </h5>
             </div>
-            <div class="card-body">
-                <div class="chart-container">
+            <div class="card-body p-3" style="padding-bottom:8px !important;">
+                <div class="chart-container" style="height:auto;min-height:260px;">
                     <canvas id="budgetChart"></canvas>
                 </div>
-                <div class="mt-3">
+                <div class="mt-1 spark-wrap" style="margin-top:6px !important;">
                     <small class="text-muted">Last 14 days progress</small>
-                    <canvas id="progressSpark" height="70"></canvas>
+                    <canvas id="progressSpark" height="40"></canvas>
                 </div>
             </div>
         </div>
@@ -314,6 +331,7 @@ new Chart(ctx1, {
     options: {
         responsive: true,
         maintainAspectRatio: false,
+        layout: { padding: 0 },
         plugins: {
             legend: {
                 display: false
@@ -322,6 +340,7 @@ new Chart(ctx1, {
         scales: {
             y: {
                 beginAtZero: true,
+                grid: { color: 'rgba(107, 114, 128, 0.1)', drawBorder: false },
                 ticks: {
                     callback: function(value) {
                         return '₹' + value.toLocaleString();
@@ -350,6 +369,7 @@ new Chart(sparkCtx, {
     options: {
         responsive: true,
         maintainAspectRatio: false,
+        layout: { padding: 0 },
         plugins: { legend: { display: false } },
         scales: {
             x: { display: false },

@@ -1,0 +1,77 @@
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="dashboard-widget">
+            <div class="p-3 d-flex flex-wrap gap-2 justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fas fa-sliders-h text-muted"></i>
+                    <strong>Analytics</strong>
+                </div>
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Views">
+                        <button id="densityToggle" class="btn btn-outline-secondary" title="Toggle density"><i class="fas fa-compress-arrows-alt"></i></button>
+                        <button id="notificationsBtn" class="btn btn-outline-secondary" title="Notifications"><i class="fas fa-bell"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+// Density toggle (shared)
+(function(){
+  const btn = document.getElementById('densityToggle');
+  if (!btn) return;
+  const key = 'dashboard:density';
+  const apply = () => {
+    const mode = localStorage.getItem(key) || 'comfortable';
+    document.body.classList.toggle('density-compact', mode === 'compact');
+  };
+  apply();
+  btn.addEventListener('click', () => {
+    const curr = localStorage.getItem(key) || 'comfortable';
+    const next = curr === 'compact' ? 'comfortable' : 'compact';
+    localStorage.setItem(key, next);
+    apply();
+  });
+})();
+
+// Notifications slideout (shared lightweight)
+(function(){
+  const btn = document.getElementById('notificationsBtn');
+  if (!btn) return;
+  let panel = document.getElementById('notificationsPanel');
+  const ensurePanel = () => {
+    if (panel) return panel;
+    panel = document.createElement('div');
+    panel.id = 'notificationsPanel';
+    panel.style.position = 'fixed';
+    panel.style.top = '0';
+    panel.style.right = '-360px';
+    panel.style.width = '360px';
+    panel.style.height = '100%';
+    panel.style.background = 'var(--glass-bg)';
+    panel.style.backdropFilter = 'saturate(140%) blur(10px)';
+    panel.style.webkitBackdropFilter = 'saturate(140%) blur(10px)';
+    panel.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
+    panel.style.borderLeft = '1px solid var(--glass-border)';
+    panel.style.transition = 'right .25s ease';
+    panel.style.zIndex = '1055';
+    panel.innerHTML = '<div class="p-3"><div class="d-flex justify-content-between align-items-center mb-2"><strong>Notifications</strong><button class="btn btn-sm btn-outline-secondary" id="notifClose">Close</button></div><div id="notifList" class="d-flex flex-column gap-2"></div></div>';
+    document.body.appendChild(panel);
+    const list = panel.querySelector('#notifList');
+    ['System update deployed','New activity recorded','Reminder: pending task'].forEach(t => {
+      const item = document.createElement('div');
+      item.className = 'activity-item';
+      item.innerHTML = '<div class="activity-icon primary"><i class="fas fa-bell"></i></div><div><div>'+t+'</div><small class="text-muted">Just now</small></div>';
+      list.appendChild(item);
+    });
+    panel.querySelector('#notifClose').onclick = () => toggle(false);
+    return panel;
+  };
+  const toggle = (open) => {
+    ensurePanel().style.right = open ? '0' : '-360px';
+  };
+  btn.addEventListener('click', () => toggle(!ensurePanel().style.right || ensurePanel().style.right !== '0px'));
+})();
+</script>
+

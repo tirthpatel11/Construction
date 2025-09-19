@@ -8,6 +8,8 @@
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Chart.js -->
@@ -16,9 +18,8 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     
     <style>
-        {% with theme=request.session.ui_theme|default:'light' %}
-        {% if theme == 'dark' %}
-        :root {
+        /* Dark theme overrides without template tags */
+        body.theme-dark {
             --primary-color: #60a5fa;
             --secondary-color: #94a3b8;
             --success-color: #34d399;
@@ -26,8 +27,9 @@
             --danger-color: #f87171;
             --dark-color: #0f172a;
             --light-color: #0b1220;
+            background-color: var(--light-color);
+            color: #e2e8f0;
         }
-        body.theme-dark { background-color: var(--light-color); color: #e2e8f0; }
         body.theme-dark .card { background-color: #111827; color: #e2e8f0; }
         body.theme-dark .sidebar { background: linear-gradient(135deg, #0b1220 0%, #111827 100%); }
         body.theme-dark .table { color: #e5e7eb; }
@@ -46,46 +48,87 @@
         body.theme-dark .btn-close { filter: invert(1); }
         .table thead th { background-color: #1f2937; }
         .heatmap-container { background: #111827; }
-        {% endif %}
-        {% endwith %}
         :root {
-            --primary-color: #2563eb;
+            --primary-color: #7c3aed;
             --secondary-color: #64748b;
             --success-color: #10b981;
             --warning-color: #f59e0b;
             --danger-color: #ef4444;
             --dark-color: #1e293b;
-            --light-color: #f8fafc;
-            --ui-gap: 0.5rem; /* global compact spacing */
+            --light-color: #faf5ff;
+            --ui-gap: 0.5rem; /* global spacing */
+            --glass-bg: rgba(255,255,255,0.6);
+            --glass-bg-dark: rgba(17,24,39,0.55);
+            --glass-border: rgba(255,255,255,0.35);
+            --glass-border-dark: rgba(148,163,184,0.2);
+            --shadow-soft: 0 8px 30px rgba(0,0,0,0.08);
         }
         
         body {
-            background-color: var(--light-color);
+            background:
+                radial-gradient(1200px 600px at -10% -10%, #e9d5ff 0%, rgba(233,213,255,0) 60%),
+                radial-gradient(900px 500px at 110% -10%, #f3e8ff 0%, rgba(243,232,255,0) 60%),
+                linear-gradient(180deg, #faf5ff 0%, #f3e8ff 100%);
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
         .sidebar {
-            background: linear-gradient(135deg, var(--dark-color) 0%, #334155 100%);
-            min-height: 100vh;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-            position: sticky;
+            background: linear-gradient(180deg, rgba(15,23,42,0.72), rgba(15,23,42,0.64));
+            backdrop-filter: saturate(140%) blur(10px);
+            -webkit-backdrop-filter: saturate(140%) blur(10px);
+            border-right: 1px solid var(--glass-border-dark);
+            box-shadow: 2px 0 20px rgba(0,0,0,0.15);
+            position: fixed;
+            left: 0;
             top: 0;
+            bottom: 0;
             overflow-y: auto;
+            width: 260px;
+            transition: width .25s ease, transform .25s ease;
+            z-index: 1050;
+        }
+
+        /* Collapsed (icon-only) desktop sidebar */
+        body.sidebar-collapsed .sidebar { width: 78px; }
+        body.sidebar-collapsed .sidebar .brand-text { display: none; }
+        body.sidebar-collapsed .sidebar .nav-label { display: none; }
+        body.sidebar-collapsed .sidebar .caret { display: none; }
+        body.sidebar-collapsed .sidebar .nav-sub { display: none !important; }
+        body.sidebar-collapsed .sidebar .nav .nav-link { padding: 12px 14px; justify-content: center; }
+        body.sidebar-collapsed .sidebar .nav .nav-link i { margin-right: 0 !important; font-size: 1.1rem; }
+
+        /* Active indicator */
+        .sidebar .nav-link {
+            position: relative;
+        }
+        .sidebar .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 10px;
+            bottom: 10px;
+            width: 3px;
+            border-radius: 3px;
+            background: var(--primary-color);
+            box-shadow: 0 0 12px rgba(124,58,237,0.6);
         }
         
         .sidebar .nav-link {
             color: #cbd5e1;
             padding: 12px 20px;
-            margin: 4px 0;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            margin: 4px 8px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.25s ease;
         }
         
         .sidebar .nav-link:hover,
         .sidebar .nav-link.active {
-            background-color: var(--primary-color);
-            color: white;
-            transform: translateX(5px);
+            background: radial-gradient(60% 60% at 50% 50%, rgba(124,58,237,0.18), rgba(124,58,237,0.06));
+            color: #e9d5ff;
+            transform: translateX(2px);
         }
         .menu-section { margin-bottom: 4px; }
         .menu-section .caret { transition: transform .2s ease; }
@@ -99,8 +142,30 @@
         }
         .nav-link-sm i { font-size: 0.85rem; }
         .nav-link-sm:hover { background-color: rgba(148,163,184,0.12); color: #e2e8f0; }
+
+        /* Floating edge collapse button */
+        .edge-toggle {
+            position: fixed;
+            top: 12px;
+            left: calc(260px - 14px);
+            width: 28px;
+            height: 28px;
+            border-radius: 9999px;
+            background: rgba(2,6,23,0.9);
+            color: #e2e8f0;
+            border: 2px solid rgba(255,255,255,0.08);
+            box-shadow: 0 0 0 2px rgba(124,58,237,0.35), 0 6px 18px rgba(0,0,0,0.28);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: left .25s ease, transform .1s ease, box-shadow .2s ease;
+            z-index: 1100;
+        }
+        .edge-toggle:hover { transform: scale(1.06); box-shadow: 0 0 0 3px rgba(124,58,237,0.45), 0 8px 22px rgba(0,0,0,0.33); }
+        body.sidebar-collapsed .edge-toggle { left: calc(78px - 14px); }
+        @media (max-width: 991.98px) { .edge-toggle { display: none !important; } }
         
-        /* Compact global gutters and block spacing */
+        /* Global gutters and block spacing */
         .row { 
             --bs-gutter-x: var(--ui-gap);
             --bs-gutter-y: var(--ui-gap);
@@ -113,27 +178,32 @@
             --bs-gutter-y: var(--ui-gap); 
         }
 
-        /* Tighter layout paddings */
+        /* Default layout paddings */
         .container-fluid .p-4 { padding: 12px !important; }
         .card-body { padding: 12px 14px; }
         .card-header { padding: 10px 14px; }
-
+        .dashboard-widget > .p-4 { padding: 12px !important; }
+        
         .card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            background: var(--glass-bg);
+            backdrop-filter: saturate(140%) blur(10px);
+            -webkit-backdrop-filter: saturate(140%) blur(10px);
+            box-shadow: var(--shadow-soft);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
             margin-bottom: calc(var(--ui-gap) + 2px);
         }
         
         .card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
         }
         
         .stat-card {
-            background: linear-gradient(135deg, var(--primary-color) 0%, #3b82f6 100%);
-            color: white;
+            background: linear-gradient(135deg, rgba(124,58,237,0.15) 0%, rgba(147,51,234,0.25) 100%);
+            border: 1px solid var(--glass-border);
+            color: #0f172a;
         }
         
         .stat-card.success {
@@ -180,9 +250,11 @@
         }
         
         .heatmap-container {
-            background: white;
-            border-radius: 12px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
             padding: 16px; /* tighter */
+            backdrop-filter: saturate(140%) blur(10px);
         }
 
         /* Normalize large utility spacers to compact gaps */
@@ -246,6 +318,25 @@
             padding: 6px 12px;
             border-radius: 20px;
         }
+
+        /* Masonry-like auto layout to remove vertical gaps between feature cards */
+        .row.masonry-auto { display: block; column-gap: var(--ui-gap); }
+        .row.masonry-auto > [class*="col-"] { display: inline-block; width: 100%; break-inside: avoid; margin: 0 0 var(--ui-gap) 0; vertical-align: top; }
+        @media (min-width: 992px) { .row.masonry-auto { column-count: 2; } }
+        @media (min-width: 1400px) { .row.masonry-auto { column-count: 3; } }
+
+        /* Density compact mode - reduces whitespace across all dashboards */
+        body.density-compact { --ui-gap: 0.35rem; }
+        body.density-compact .container-fluid .p-4 { padding: 8px !important; }
+        body.density-compact .card-body { padding: 10px 12px; }
+        body.density-compact .card-header { padding: 8px 12px; }
+        body.density-compact .dashboard-widget > .p-4 { padding: 10px !important; }
+        body.density-compact .mb-4 { margin-bottom: var(--ui-gap) !important; }
+        body.density-compact .my-4 { margin-top: var(--ui-gap) !important; margin-bottom: var(--ui-gap) !important; }
+        body.density-compact .py-4 { padding-top: var(--ui-gap) !important; padding-bottom: var(--ui-gap) !important; }
+        body.density-compact .mt-4 { margin-top: var(--ui-gap) !important; }
+        body.density-compact .pt-4 { padding-top: var(--ui-gap) !important; }
+        body.density-compact .table th, body.density-compact .table td { padding: 8px 10px; }
         /* Responsive sidebar (hide on small screens, slide in) */
         @media (max-width: 991.98px) {
             .sidebar {
@@ -271,6 +362,21 @@
             body.sidebar-open { overflow: hidden; }
             .col-md-9.col-lg-10 { width: 100%; flex: 0 0 100%; max-width: 100%; }
             .col-md-3.col-lg-2 { width: auto; flex: 0 0 auto; max-width: none; }
+        }
+
+        /* Fixed layout content margins */
+        @media (min-width: 992px) {
+            /* Use the full viewport width minus the sidebar; avoid right empty space */
+            .main-col {
+                margin-left: 260px;
+                width: calc(100% - 260px) !important;
+                max-width: none;
+                flex: 0 0 auto;
+            }
+            body.sidebar-collapsed .main-col {
+                margin-left: 78px;
+                width: calc(100% - 78px) !important;
+            }
         }
         
         .alert {
@@ -302,72 +408,72 @@
             <div class="col-md-3 col-lg-2 px-0">
                 <div class="sidebar">
                     <div class="p-4">
-                        <h4 class="text-white mb-4">
+                        <h4 class="text-white mb-4 d-flex align-items-center">
                             <i class="fas fa-building me-2"></i>
-                            SiteSphere
+                            <span class="brand-text">SiteSphere</span>
                         </h4>
                         <nav class="nav flex-column">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'dashboard:home' %}">
-                                <i class="fas fa-tachometer-alt me-2"></i>
-                                Dashboard
+                            <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'dashboard:home' %}" data-bs-toggle="tooltip" data-bs-placement="right" title="Dashboard">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span class="nav-label">Dashboard</span>
                             </a>
                             <div class="menu-section" id="menu-projects">
-                                <a class="nav-link menu-parent {% if request.resolver_match.url_name == 'project_selection' %}active{% endif %}" href="{% url 'dashboard:project_selection' %}" data-toggle="submenu">
-                                    <i class="fas fa-project-diagram me-2"></i>
-                                    Projects <i class="fas fa-chevron-right float-end caret"></i>
+                                <a class="nav-link menu-parent {% if request.resolver_match.url_name == 'project_selection' %}active{% endif %}" href="{% url 'dashboard:project_selection' %}" data-toggle="submenu" data-bs-toggle="tooltip" data-bs-placement="right" title="Projects">
+                                    <i class="fas fa-project-diagram"></i>
+                                    <span class="nav-label">Projects</span> <i class="fas fa-chevron-right float-end caret"></i>
                                 </a>
                                 <div class="nav-sub">
-                                <a class="nav-link nav-link-sm" href="{% url 'projects:create' %}"><i class="fas fa-plus-circle me-2"></i>Create Project</a>
+                                <a class="nav-link nav-link-sm" href="{% url 'projects:create' %}"><i class="fas fa-plus-circle me-2"></i><span class="nav-label">Create Project</span></a>
                                 </div>
                             </div>
-                            <a class="nav-link {% if 'engineering' in request.resolver_match.namespace %}active{% endif %}" href="{% url 'engineering:dashboard' %}">
-                                <i class="fas fa-calculator me-2"></i>
-                                Engineering
+                            <a class="nav-link {% if 'engineering' in request.resolver_match.namespace %}active{% endif %}" href="{% url 'engineering:dashboard' %}" data-bs-toggle="tooltip" data-bs-placement="right" title="Engineering">
+                                <i class="fas fa-calculator"></i>
+                                <span class="nav-label">Engineering</span>
                             </a>
                             <div class="menu-section" id="menu-material">
-                                <a class="nav-link menu-parent {% if 'material_management' in request.resolver_match.namespace %}active{% endif %}" href="{% url 'material_management:dashboard' %}" data-toggle="submenu">
-                                    <i class="fas fa-boxes me-2"></i>
-                                    Material Management <i class="fas fa-chevron-right float-end caret"></i>
+                                <a class="nav-link menu-parent {% if 'material_management' in request.resolver_match.namespace %}active{% endif %}" href="{% url 'material_management:dashboard' %}" data-toggle="submenu" data-bs-toggle="tooltip" data-bs-placement="right" title="Material Management">
+                                    <i class="fas fa-boxes"></i>
+                                    <span class="nav-label">Material Management</span> <i class="fas fa-chevron-right float-end caret"></i>
                                 </a>
                                 <div class="nav-sub">
-                                <a class="nav-link nav-link-sm" href="{% url 'material_management:supplier_create' %}"><i class="fas fa-user-plus me-2"></i>Add Supplier</a>
-                                <a class="nav-link nav-link-sm" href="{% url 'material_management:material_create' %}"><i class="fas fa-box-open me-2"></i>Add Material</a>
-                                <a class="nav-link nav-link-sm" href="{% url 'material_management:purchase_order_create' %}"><i class="fas fa-file-invoice-dollar me-2"></i>Create Purchase Order</a>
-                                <a class="nav-link nav-link-sm" href="{% url 'material_management:requisition_create' %}"><i class="fas fa-list-check me-2"></i>Create Requisition</a>
+                                <a class="nav-link nav-link-sm" href="{% url 'material_management:supplier_create' %}"><i class="fas fa-user-plus me-2"></i><span class="nav-label">Add Supplier</span></a>
+                                <a class="nav-link nav-link-sm" href="{% url 'material_management:material_create' %}"><i class="fas fa-box-open me-2"></i><span class="nav-label">Add Material</span></a>
+                                <a class="nav-link nav-link-sm" href="{% url 'material_management:purchase_order_create' %}"><i class="fas fa-file-invoice-dollar me-2"></i><span class="nav-label">Create Purchase Order</span></a>
+                                <a class="nav-link nav-link-sm" href="{% url 'material_management:requisition_create' %}"><i class="fas fa-list-check me-2"></i><span class="nav-label">Create Requisition</span></a>
                                 </div>
                             </div>
                             <div class="menu-section" id="menu-accounts">
-                                <a class="nav-link menu-parent {% if 'accounts' in request.resolver_match.namespace %}active{% endif %}" href="{% url 'accounts:dashboard' %}" data-toggle="submenu">
-                                    <i class="fas fa-book me-2"></i>
-                                    Accounts <i class="fas fa-chevron-right float-end caret"></i>
+                                <a class="nav-link menu-parent {% if 'accounts' in request.resolver_match.namespace %}active{% endif %}" href="{% url 'accounts:dashboard' %}" data-toggle="submenu" data-bs-toggle="tooltip" data-bs-placement="right" title="Accounts">
+                                    <i class="fas fa-book"></i>
+                                    <span class="nav-label">Accounts</span> <i class="fas fa-chevron-right float-end caret"></i>
                                 </a>
                                 <div class="nav-sub">
-                                <a class="nav-link nav-link-sm" href="{% url 'accounts:journal_entry_create' %}"><i class="fas fa-receipt me-2"></i>New Journal Entry</a>
-                                <a class="nav-link nav-link-sm" href="{% url 'accounts:budget_create' %}"><i class="fas fa-wallet me-2"></i>Create Budget</a>
+                                <a class="nav-link nav-link-sm" href="{% url 'accounts:journal_entry_create' %}"><i class="fas fa-receipt me-2"></i><span class="nav-label">New Journal Entry</span></a>
+                                <a class="nav-link nav-link-sm" href="{% url 'accounts:budget_create' %}"><i class="fas fa-wallet me-2"></i><span class="nav-label">Create Budget</span></a>
                                 </div>
                             </div>
                             <div class="menu-section" id="menu-sales">
-                                <a class="nav-link menu-parent {% if 'sales' in request.resolver_match.namespace %}active{% endif %}" href="{% url 'sales:dashboard' %}" data-toggle="submenu">
-                                    <i class="fas fa-shopping-cart me-2"></i>
-                                    Sales <i class="fas fa-chevron-right float-end caret"></i>
+                                <a class="nav-link menu-parent {% if 'sales' in request.resolver_match.namespace %}active{% endif %}" href="{% url 'sales:dashboard' %}" data-toggle="submenu" data-bs-toggle="tooltip" data-bs-placement="right" title="Sales">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    <span class="nav-label">Sales</span> <i class="fas fa-chevron-right float-end caret"></i>
                                 </a>
                                 <div class="nav-sub">
-                                <a class="nav-link nav-link-sm" href="{% url 'sales:booking_create' %}"><i class="fas fa-handshake me-2"></i>New Booking</a>
-                                <a class="nav-link nav-link-sm" href="{% url 'sales:customer_create' %}"><i class="fas fa-user-plus me-2"></i>Add Customer</a>
+                                <a class="nav-link nav-link-sm" href="{% url 'sales:booking_create' %}"><i class="fas fa-handshake me-2"></i><span class="nav-label">New Booking</span></a>
+                                <a class="nav-link nav-link-sm" href="{% url 'sales:customer_create' %}"><i class="fas fa-user-plus me-2"></i><span class="nav-label">Add Customer</span></a>
                                 </div>
                             </div>
-                            <a class="nav-link" href="#">
-                                <i class="fas fa-chart-bar me-2"></i>
-                                Reports
+                            <a class="nav-link" href="#" data-bs-toggle="tooltip" data-bs-placement="right" title="Reports">
+                                <i class="fas fa-chart-bar"></i>
+                                <span class="nav-label">Reports</span>
                             </a>
-                            <a class="nav-link" href="{% url 'dashboard:settings' %}">
-                                <i class="fas fa-cog me-2"></i>
-                                Settings
+                            <a class="nav-link" href="{% url 'dashboard:settings' %}" data-bs-toggle="tooltip" data-bs-placement="right" title="Settings">
+                                <i class="fas fa-cog"></i>
+                                <span class="nav-label">Settings</span>
                             </a>
                             <hr class="my-3" style="border-color: #475569;">
-                            <a class="nav-link" href="{% url 'authentication:logout' %}">
-                                <i class="fas fa-sign-out-alt me-2"></i>
-                                Logout
+                            <a class="nav-link" href="{% url 'authentication:logout' %}" data-bs-toggle="tooltip" data-bs-placement="right" title="Logout">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span class="nav-label">Logout</span>
                             </a>
                         </nav>
                     </div>
@@ -375,18 +481,27 @@
             </div>
             
             <!-- Main Content -->
-            <div class="col-md-9 col-lg-10">
+            <div class="col-md-9 col-lg-10 main-col">
+                <!-- Floating collapse control -->
+                <button id="edgeCollapse" class="edge-toggle d-none d-lg-flex" type="button" aria-label="Collapse sidebar">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
                 <div class="p-4">
                     <!-- Top Navigation -->
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="history.back()" title="Go back">
+                                <i class="bi bi-arrow-left"></i>
+                            </button>
                             <h2 class="mb-0">{% block page_title %}Dashboard{% endblock %}</h2>
                             <p class="text-muted mb-0">Welcome back, {{ user.first_name|default:user.username }}!</p>
                         </div>
                         <div class="d-flex align-items-center">
-                            <button id="sidebarToggle" class="btn btn-outline-secondary me-2 d-lg-none" type="button">
-                                <i class="fas fa-bars"></i>
-                            </button>
+                            <div class="btn-group me-2">
+                                <button id="sidebarToggle" class="btn btn-outline-secondary d-lg-none" type="button" aria-label="Toggle sidebar">
+                                    <i class="fas fa-bars"></i>
+                                </button>
+                            </div>
                             <div class="dropdown">
                                 <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
                                     <i class="fas fa-user-circle me-2"></i>
@@ -431,10 +546,26 @@
     <script>
         (function(){
             const toggleBtn = document.getElementById('sidebarToggle');
+            const collapseBtn = document.getElementById('edgeCollapse');
             const backdrop = document.querySelector('.sidebar-backdrop');
             if (toggleBtn) {
                 toggleBtn.addEventListener('click', function(){
                     document.body.classList.toggle('sidebar-open');
+                });
+            }
+            // Persistent collapsed state (desktop icon-only)
+            const COLLAPSE_KEY = 'ui:sidebar-collapsed';
+            const applyCollapsed = () => {
+                const isCollapsed = localStorage.getItem(COLLAPSE_KEY) === '1';
+                document.body.classList.toggle('sidebar-collapsed', isCollapsed);
+                if (collapseBtn) collapseBtn.innerHTML = isCollapsed ? '<i class="fas fa-chevron-right"></i>' : '<i class="fas fa-chevron-left"></i>';
+            };
+            applyCollapsed();
+            if (collapseBtn) {
+                collapseBtn.addEventListener('click', function(){
+                    const next = localStorage.getItem(COLLAPSE_KEY) === '1' ? '0' : '1';
+                    localStorage.setItem(COLLAPSE_KEY, next);
+                    applyCollapsed();
                 });
             }
             if (backdrop) {
@@ -460,6 +591,11 @@
                         e.preventDefault();
                     }
                 });
+            });
+            // Bootstrap tooltips for collapsed mode
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                new bootstrap.Tooltip(tooltipTriggerEl);
             });
         })();
     </script>

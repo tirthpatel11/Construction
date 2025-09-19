@@ -7,12 +7,14 @@
 {% block extra_css %}
 <style>
     .dashboard-widget {
-        background: white;
+        background: var(--glass-bg);
         border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        border: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow: var(--shadow-soft);
+        border: 1px solid var(--glass-border);
         transition: all 0.3s ease;
         overflow: hidden;
+        backdrop-filter: saturate(140%) blur(10px);
+        -webkit-backdrop-filter: saturate(140%) blur(10px);
     }
     
     .dashboard-widget:hover {
@@ -21,12 +23,14 @@
     }
     
     .stat-card-modern {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        background: linear-gradient(135deg, rgba(124,58,237,0.16) 0%, rgba(147,51,234,0.28) 100%);
+        color: #0f172a;
         border-radius: 20px;
-        padding: 2rem;
+        padding: 1.25rem;
         position: relative;
         overflow: hidden;
+        border: 1px solid var(--glass-border);
+        backdrop-filter: saturate(140%) blur(10px);
     }
     
     .stat-card-modern::before {
@@ -61,18 +65,20 @@
     .chart-container-modern {
         position: relative;
         height: 350px;
-        background: white;
+        background: var(--glass-bg);
         border-radius: 16px;
-        padding: 1.5rem;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        padding: 1.25rem;
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--shadow-soft);
+        backdrop-filter: saturate(140%) blur(10px);
     }
     
     .metric-card {
-        background: white;
+        background: var(--glass-bg);
         border-radius: 12px;
-        padding: 1.5rem;
-        border-left: 4px solid var(--primary-color);
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        padding: 1rem;
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--shadow-soft);
     }
     
     .metric-card.success {
@@ -103,12 +109,14 @@
     .activity-item {
         display: flex;
         align-items: center;
-        padding: 1rem;
+        padding: 0.9rem;
         border-radius: 12px;
         margin-bottom: 0.5rem;
-        background: white;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--shadow-soft);
         transition: all 0.3s ease;
+        backdrop-filter: saturate(140%) blur(10px);
     }
     
     .activity-item:hover {
@@ -128,7 +136,7 @@
     }
     
     .activity-icon.primary {
-        background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+        background: linear-gradient(135deg, var(--primary-color), #6d28d9);
         color: white;
     }
     
@@ -143,10 +151,12 @@
     }
     
     .heatmap-modern {
-        background: white;
+        background: var(--glass-bg);
         border-radius: 16px;
-        padding: 1.5rem;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        padding: 1.25rem;
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--shadow-soft);
+        backdrop-filter: saturate(140%) blur(10px);
     }
     
     .loading-spinner {
@@ -198,6 +208,7 @@
 {% endblock %}
 
 {% block content %}
+
 <!-- Welcome Section -->
 <div class="row mb-4">
     <div class="col-12">
@@ -223,9 +234,9 @@
 </div>
 
 <!-- Statistics Cards -->
-<div class="row mb-4">
+<div class="row mb-4" id="kpiGrid" data-grid="kpi">
     <div class="col-lg-3 col-md-6 mb-4">
-        <div class="stat-card-modern">
+        <div class="stat-card-modern draggable-widget" draggable="true" data-widget-id="kpi-total-projects">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <h2 class="mb-1">{{ total_projects }}</h2>
@@ -242,7 +253,7 @@
         </div>
     </div>
     <div class="col-lg-3 col-md-6 mb-4">
-        <div class="stat-card-modern stat-card-success">
+        <div class="stat-card-modern stat-card-success draggable-widget" draggable="true" data-widget-id="kpi-active-projects">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <h2 class="mb-1">{{ active_projects }}</h2>
@@ -259,7 +270,7 @@
         </div>
     </div>
     <div class="col-lg-3 col-md-6 mb-4">
-        <div class="stat-card-modern stat-card-warning">
+        <div class="stat-card-modern stat-card-warning draggable-widget" draggable="true" data-widget-id="kpi-total-budget">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <h2 class="mb-1">₹{{ total_budget|floatformat:0 }}</h2>
@@ -276,7 +287,7 @@
         </div>
     </div>
     <div class="col-lg-3 col-md-6 mb-4">
-        <div class="stat-card-modern stat-card-danger">
+        <div class="stat-card-modern stat-card-danger draggable-widget" draggable="true" data-widget-id="kpi-budget-used">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <h2 class="mb-1">{{ budget_utilization|floatformat:1 }}%</h2>
@@ -295,10 +306,10 @@
 </div>
 
 <!-- Charts Row -->
-<div class="row mb-4">
+<div class="row mb-4" id="widgetsGrid" data-grid="widgets">
     <!-- Cash Flow Chart -->
     <div class="col-lg-8 mb-4">
-        <div class="dashboard-widget">
+        <div class="dashboard-widget draggable-widget" draggable="true" data-widget-id="w-cash-flow">
             <div class="chart-toolbar">
                 <div>
                     <h5 class="mb-0">
@@ -321,7 +332,7 @@
     
     <!-- Cost Breakdown & Budget Utilization -->
     <div class="col-lg-4 mb-4">
-        <div class="dashboard-widget">
+        <div class="dashboard-widget draggable-widget" draggable="true" data-widget-id="w-cost-breakdown">
             <div class="chart-toolbar">
                 <h5 class="mb-0">
                     <i class="fas fa-chart-pie me-2 text-primary"></i>
@@ -334,7 +345,7 @@
         </div>
         
         <!-- Budget Utilization Gauge -->
-        <div class="dashboard-widget mt-3">
+        <div class="dashboard-widget mt-3 draggable-widget" draggable="true" data-widget-id="w-budget-utilization">
             <div class="p-3">
                 <h6 class="mb-3">
                     <i class="fas fa-gauge me-2 text-warning"></i>
@@ -629,6 +640,11 @@ document.addEventListener('DOMContentLoaded', function() {
         loadAnalyticsData();
         setupEventListeners();
         animateCounters();
+        setupAnalyticsToolbar();
+        setupDraggableWidgets();
+        setupDensityToggle();
+        setupNotificationsPanel();
+        restoreSavedViewsMenu();
     } catch (error) {
         console.error('Error initializing dashboard:', error);
     }
@@ -651,14 +667,16 @@ function initializeCashFlowChart() {
             return;
         }
         const chartCtx = cashFlowCtx.getContext('2d');
+        window.__cashFlowRaw = cashFlowData;
+        const filtered = filterCashFlowByCurrentRange(cashFlowData);
     
         cashFlowChart = new Chart(chartCtx, {
         type: 'line',
         data: {
-            labels: cashFlowData.map(d => d.month),
+            labels: filtered.map(d => d.month),
             datasets: [{
                 label: 'Income',
-                data: cashFlowData.map(d => d.income),
+                data: filtered.map(d => d.income),
                 borderColor: '#10b981',
                 backgroundColor: 'rgba(16, 185, 129, 0.1)',
                 borderWidth: 3,
@@ -671,7 +689,7 @@ function initializeCashFlowChart() {
                 pointHoverRadius: 8
             }, {
                 label: 'Expenses',
-                data: cashFlowData.map(d => d.expenses),
+                data: filtered.map(d => d.expenses),
                 borderColor: '#ef4444',
                 backgroundColor: 'rgba(239, 68, 68, 0.1)',
                 borderWidth: 3,
@@ -684,7 +702,7 @@ function initializeCashFlowChart() {
                 pointHoverRadius: 8
             }, {
                 label: 'Net Cash Flow',
-                data: cashFlowData.map(d => d.net),
+                data: filtered.map(d => d.net),
                 borderColor: '#2563eb',
                 backgroundColor: 'rgba(37, 99, 235, 0.1)',
                 borderWidth: 3,
@@ -878,7 +896,7 @@ function loadAnalyticsData() {
     fetch('{% url "dashboard:analytics_data" %}')
         .then(response => {
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ₹{response.status}`);
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
         })
@@ -911,7 +929,7 @@ function renderResourceHeatmap(data) {
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
-        .attr("transform", `translate(₹{margin.left},₹{margin.top})`);
+        .attr("transform", `translate(${margin.left},${margin.top})`);
 
     const resources = [...new Set(data.resource_data.map(d => d.resource))];
     const months = [...new Set(data.resource_data.map(d => d.month))];
@@ -959,7 +977,7 @@ function renderResourceHeatmap(data) {
                 .style("opacity", 0);
             
             tooltip.transition().duration(200).style("opacity", 1);
-            tooltip.html(`₹{d.resource}<br/>₹{d.month}<br/>₹{d.utilization}% utilized`);
+            tooltip.html(`${d.resource}<br/>${d.month}<br/>${d.utilization}% utilized`);
         })
         .on("mousemove", function(event) {
             d3.select(".tooltip")
@@ -974,7 +992,7 @@ function renderResourceHeatmap(data) {
 
     // Add axes
     svg.append("g")
-        .attr("transform", `translate(0,₹{height})`)
+        .attr("transform", `translate(0,${height})`)
         .call(d3.axisBottom(xScale))
         .style("font-size", "11px");
 
@@ -1090,6 +1108,229 @@ function setupEventListeners() {
     });
 }
 
+// Analytics toolbar logic
+let __currentRange = { preset: '6m', start: null, end: null };
+
+function setupAnalyticsToolbar() {
+    const btns = document.querySelectorAll('button[data-range]');
+    btns.forEach(b => b.addEventListener('click', () => {
+        btns.forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        __currentRange.preset = b.dataset.range;
+        __currentRange.start = null;
+        __currentRange.end = null;
+        applyAnalyticsRange();
+    }));
+    const applyBtn = document.getElementById('applyRange');
+    const startEl = document.getElementById('dateStart');
+    const endEl = document.getElementById('dateEnd');
+    if (applyBtn) {
+        applyBtn.addEventListener('click', () => {
+            __currentRange.preset = null;
+            __currentRange.start = startEl.value ? new Date(startEl.value) : null;
+            __currentRange.end = endEl.value ? new Date(endEl.value) : null;
+            applyAnalyticsRange();
+        });
+    }
+}
+
+function applyAnalyticsRange() {
+    if (!window.__cashFlowRaw || !cashFlowChart) return;
+    const filtered = filterCashFlowByCurrentRange(window.__cashFlowRaw);
+    cashFlowChart.data.labels = filtered.map(d => d.month);
+    cashFlowChart.data.datasets[0].data = filtered.map(d => d.income);
+    cashFlowChart.data.datasets[1].data = filtered.map(d => d.expenses);
+    cashFlowChart.data.datasets[2].data = filtered.map(d => d.net);
+    cashFlowChart.update();
+}
+
+function filterCashFlowByCurrentRange(data) {
+    // data[].month is assumed like '2025-01' or label like 'Jan 2025'. Try to parse.
+    const parseLabelDate = (label) => {
+        // Try YYYY-MM, else try Date.parse
+        if (/^\d{4}-\d{2}$/.test(label)) {
+            const [y, m] = label.split('-').map(Number);
+            return new Date(y, m - 1, 1);
+        }
+        const d = Date.parse(label);
+        return isNaN(d) ? null : new Date(d);
+    };
+    const items = data.map(d => ({ ...d, __date: parseLabelDate(d.month) })).filter(d => d.__date);
+    if (__currentRange.start && __currentRange.end) {
+        return items.filter(d => d.__date >= __currentRange.start && d.__date <= __currentRange.end);
+    }
+    const now = new Date();
+    let from = null;
+    switch (__currentRange.preset) {
+        case '7d': from = new Date(now); from.setDate(from.getDate() - 7); break;
+        case '30d': from = new Date(now); from.setDate(from.getDate() - 30); break;
+        case 'qtd': {
+            const q = Math.floor(now.getMonth() / 3); // 0-based quarter
+            from = new Date(now.getFullYear(), q * 3, 1);
+            break;
+        }
+        case 'ytd': from = new Date(now.getFullYear(), 0, 1); break;
+        case '1y': from = new Date(now.getFullYear() - 1, now.getMonth(), 1); break;
+        default: return items; // fall back to all
+    }
+    return items.filter(d => d.__date >= from && d.__date <= now);
+}
+
+// Saved views (localStorage)
+const VIEWS_KEY = 'dashboard:views';
+function restoreSavedViewsMenu() {
+    const menu = document.getElementById('viewsMenu');
+    if (!menu) return;
+    const views = JSON.parse(localStorage.getItem(VIEWS_KEY) || '[]');
+    menu.innerHTML = '';
+    if (views.length === 0) {
+        const li = document.createElement('li');
+        li.innerHTML = '<span class="dropdown-item text-muted">No saved views</span>';
+        menu.appendChild(li);
+    } else {
+        views.forEach((v) => {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.className = 'dropdown-item';
+            a.textContent = v.name;
+            a.addEventListener('click', () => applySavedView(v));
+            li.appendChild(a);
+            menu.appendChild(li);
+        });
+        const divider = document.createElement('li');
+        divider.innerHTML = '<hr class="dropdown-divider">';
+        menu.appendChild(divider);
+        const clear = document.createElement('li');
+        const clearA = document.createElement('a');
+        clearA.className = 'dropdown-item text-danger';
+        clearA.textContent = 'Delete all views';
+        clearA.addEventListener('click', () => { localStorage.removeItem(VIEWS_KEY); restoreSavedViewsMenu(); });
+        clear.appendChild(clearA);
+        menu.appendChild(clear);
+    }
+    const saveBtn = document.getElementById('saveView');
+    if (saveBtn) {
+        saveBtn.onclick = () => {
+            const name = prompt('Name this view');
+            if (!name) return;
+            const view = {
+                name,
+                range: { ...__currentRange },
+            };
+            const arr = JSON.parse(localStorage.getItem(VIEWS_KEY) || '[]');
+            arr.push(view);
+            localStorage.setItem(VIEWS_KEY, JSON.stringify(arr));
+            restoreSavedViewsMenu();
+        };
+    }
+}
+
+function applySavedView(v) {
+    __currentRange = v.range || __currentRange;
+    applyAnalyticsRange();
+}
+
+// Draggable widgets with persistence
+function setupDraggableWidgets() {
+    const makeGrid = (gridId, storageKey) => {
+        const grid = document.getElementById(gridId);
+        if (!grid) return;
+        const order = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        if (order.length) {
+            // Reorder children by saved order
+            const idToEl = {};
+            grid.querySelectorAll('.draggable-widget').forEach(el => idToEl[el.dataset.widgetId] = el.closest('.col-lg-3, .col-lg-4, .col-lg-8') || el);
+            order.forEach(id => {
+                const wrap = idToEl[id];
+                if (wrap) grid.appendChild(wrap);
+            });
+        }
+        grid.querySelectorAll('.draggable-widget').forEach(el => {
+            el.addEventListener('dragstart', e => {
+                e.dataTransfer.setData('text/plain', el.dataset.widgetId);
+                e.dataTransfer.effectAllowed = 'move';
+            });
+        });
+        grid.addEventListener('dragover', e => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        });
+        grid.addEventListener('drop', e => {
+            e.preventDefault();
+            const id = e.dataTransfer.getData('text/plain');
+            const dragged = grid.querySelector(`[data-widget-id="${id}"]`);
+            if (!dragged) return;
+            const target = e.target.closest('.draggable-widget');
+            const targetWrap = target ? (target.closest('.col-lg-3, .col-lg-4, .col-lg-8') || target) : null;
+            const draggedWrap = (dragged.closest('.col-lg-3, .col-lg-4, .col-lg-8') || dragged);
+            if (targetWrap && draggedWrap !== targetWrap) {
+                grid.insertBefore(draggedWrap, targetWrap);
+            } else {
+                grid.appendChild(draggedWrap);
+            }
+            const newOrder = Array.from(grid.querySelectorAll('.draggable-widget')).map(x => x.dataset.widgetId);
+            localStorage.setItem(storageKey, JSON.stringify(newOrder));
+        });
+    };
+    makeGrid('kpiGrid', 'dashboard:kpiOrder');
+    makeGrid('widgetsGrid', 'dashboard:widgetsOrder');
+}
+
+// Density toggle
+function setupDensityToggle() {
+    const btn = document.getElementById('densityToggle');
+    if (!btn) return;
+    const key = 'dashboard:density';
+    const apply = () => {
+        const mode = localStorage.getItem(key) || 'comfortable';
+        document.body.classList.toggle('density-compact', mode === 'compact');
+    };
+    apply();
+    btn.addEventListener('click', () => {
+        const curr = localStorage.getItem(key) || 'comfortable';
+        const next = curr === 'compact' ? 'comfortable' : 'compact';
+        localStorage.setItem(key, next);
+        apply();
+    });
+}
+
+// Notifications slideout (simple)
+function setupNotificationsPanel() {
+    const btn = document.getElementById('notificationsBtn');
+    if (!btn) return;
+    let panel = document.getElementById('notificationsPanel');
+    if (!panel) {
+        panel = document.createElement('div');
+        panel.id = 'notificationsPanel';
+        panel.style.position = 'fixed';
+        panel.style.top = '0';
+        panel.style.right = '-360px';
+        panel.style.width = '360px';
+        panel.style.height = '100%';
+        panel.style.background = 'var(--glass-bg)';
+        panel.style.backdropFilter = 'saturate(140%) blur(10px)';
+        panel.style.webkitBackdropFilter = 'saturate(140%) blur(10px)';
+        panel.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
+        panel.style.borderLeft = '1px solid var(--glass-border)';
+        panel.style.transition = 'right .25s ease';
+        panel.style.zIndex = '1055';
+        panel.innerHTML = '<div class="p-3"><div class="d-flex justify-content-between align-items-center mb-2"><strong>Notifications</strong><button class="btn btn-sm btn-outline-secondary" id="notifClose">Close</button></div><div id="notifList" class="d-flex flex-column gap-2"></div></div>';
+        document.body.appendChild(panel);
+        const list = panel.querySelector('#notifList');
+        ['Project A milestone reached','Payment due tomorrow','New requisition approved'].forEach(t => {
+            const item = document.createElement('div');
+            item.className = 'activity-item';
+            item.innerHTML = '<div class="activity-icon primary"><i class="fas fa-bell"></i></div><div><div>'+t+'</div><small class="text-muted">Just now</small></div>';
+            list.appendChild(item);
+        });
+        panel.querySelector('#notifClose').onclick = () => toggle(false);
+    }
+    const toggle = (open) => {
+        panel.style.right = open ? '0' : '-360px';
+    };
+    btn.addEventListener('click', () => toggle(panel.style.right !== '0px'));
+}
+
 // Animate counters on page load
 function animateCounters() {
     const counters = document.querySelectorAll('.stat-card-modern h2');
@@ -1140,7 +1381,7 @@ function exportDashboard() {
         'Budget Utilization': '{{ budget_utilization|floatformat:1|default:0 }}%'
     };
     
-    const csv = Object.entries(data).map(([key, value]) => `₹{key},₹{value}`).join('\n');
+    const csv = Object.entries(data).map(([key, value]) => `${key},${value}`).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
