@@ -118,6 +118,53 @@ def project_detail(request, project_id):
     if project.actual_cost and project.actual_cost > 0 and project.estimated_budget and project.estimated_budget > 0:
         cpi = round(float(project.estimated_budget) / float(project.actual_cost), 2)
     
+    # Calculate project analytics data
+    from datetime import datetime, timedelta
+    project_days = (timezone.now() - project.created_at).days
+    
+    # Budget performance assessment
+    budget_utilization = (project.actual_cost / project.estimated_budget * 100) if project.estimated_budget > 0 else 0
+    if budget_utilization <= 80:
+        budget_performance = 'excellent'
+    elif budget_utilization <= 95:
+        budget_performance = 'good'
+    elif budget_utilization <= 110:
+        budget_performance = 'fair'
+    else:
+        budget_performance = 'poor'
+    
+    # Schedule performance assessment
+    if overall_progress >= 90:
+        schedule_performance = 'excellent'
+    elif overall_progress >= 70:
+        schedule_performance = 'good'
+    elif overall_progress >= 50:
+        schedule_performance = 'fair'
+    else:
+        schedule_performance = 'poor'
+    
+    # Quality score (simulated based on progress and budget performance)
+    quality_score = min(100, max(0, (float(overall_progress) + (100 - float(budget_utilization))) / 2))
+    
+    # Risk assessment
+    budget_risk = 'low'
+    if budget_utilization > 90:
+        budget_risk = 'high'
+    elif budget_utilization > 75:
+        budget_risk = 'medium'
+    
+    schedule_risk = 'low'
+    if overall_progress < 30:
+        schedule_risk = 'high'
+    elif overall_progress < 60:
+        schedule_risk = 'medium'
+    
+    resource_risk = 'low'
+    if project_days > 365:
+        resource_risk = 'high'
+    elif project_days > 180:
+        resource_risk = 'medium'
+    
     context = {
         'project': project,
         'partners': project.partners.all(),
@@ -132,6 +179,14 @@ def project_detail(request, project_id):
         'spi': spi,
         'cpi': cpi,
         'progress_spark': list(ProjectProgressSnapshot.objects.filter(project=project).order_by('-snapshot_date')[:14].values_list('progress_percent', flat=True))[::-1],
+        # Analytics data
+        'project_days': project_days,
+        'budget_performance': budget_performance,
+        'schedule_performance': schedule_performance,
+        'quality_score': quality_score,
+        'budget_risk': budget_risk,
+        'schedule_risk': schedule_risk,
+        'resource_risk': resource_risk,
     }
     
     return render(request, 'projects/detail.html', context)

@@ -18,6 +18,37 @@
 .project-analytics .card-body{display:flex;flex-direction:column}
 .project-analytics .chart-container{flex:0 0 280px}
 .project-analytics .spark-wrap{flex:0 0 auto}
+
+/* Analytics Dashboard Styles */
+.metric-card {
+    padding: 15px;
+    border-radius: 12px;
+    background: rgba(124, 58, 237, 0.05);
+    border: 1px solid rgba(124, 58, 237, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
+}
+
+.milestone-item {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.milestone-item:last-child {
+    border-bottom: none;
+}
+
+.risk-indicator {
+    padding: 6px 0;
+}
+
+.risk-indicator .progress {
+    border-radius: 4px;
+}
 </style>
 {% endblock %}
 
@@ -166,6 +197,216 @@
                 <div class="mt-1 spark-wrap" style="margin-top:6px !important;">
                     <small class="text-muted">Last 14 days progress</small>
                     <canvas id="progressSpark" height="40"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Project Analytics Dashboard -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-graph-up me-2 text-primary"></i>
+                    Project Analytics Dashboard
+                </h5>
+            </div>
+            <div class="card-body">
+                <!-- Project Metrics -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="metric-card text-center">
+                            <div class="metric-icon bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
+                                <i class="bi bi-speedometer2"></i>
+                            </div>
+                            <h4 class="text-primary mb-1">{{ project.completion_percentage|default:0 }}%</h4>
+                            <small class="text-muted">Completion Rate</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="metric-card text-center">
+                            <div class="metric-icon bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
+                                <i class="bi bi-currency-rupee"></i>
+                            </div>
+                            <h4 class="text-success mb-1">₹{{ project.estimated_budget|floatformat:0|default:0 }}</h4>
+                            <small class="text-muted">Total Budget</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="metric-card text-center">
+                            <div class="metric-icon bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
+                                <i class="bi bi-cash-stack"></i>
+                            </div>
+                            <h4 class="text-warning mb-1">₹{{ project.actual_cost|floatformat:0|default:0 }}</h4>
+                            <small class="text-muted">Actual Cost</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="metric-card text-center">
+                            <div class="metric-icon bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
+                                <i class="bi bi-calendar-check"></i>
+                            </div>
+                            <h4 class="text-info mb-1">{{ project_days|default:0 }}</h4>
+                            <small class="text-muted">Days Active</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Charts -->
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <i class="bi bi-pie-chart me-2 text-info"></i>
+                                    Budget Utilization
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="budgetUtilizationChart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <i class="bi bi-bar-chart me-2 text-success"></i>
+                                    Monthly Progress
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="monthlyProgressChart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Health & Risk Assessment -->
+                <div class="row">
+                    <div class="col-md-8 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <i class="bi bi-heart-pulse me-2 text-danger"></i>
+                                    Project Health Status
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted mb-3">Performance Indicators</h6>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span>Budget Performance</span>
+                                            <span class="badge bg-{% if budget_performance == 'excellent' %}success{% elif budget_performance == 'good' %}primary{% elif budget_performance == 'fair' %}warning{% else %}danger{% endif %}">
+                                                {{ budget_performance|title }}
+                                            </span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span>Schedule Adherence</span>
+                                            <span class="badge bg-{% if schedule_performance == 'excellent' %}success{% elif schedule_performance == 'good' %}primary{% elif schedule_performance == 'fair' %}warning{% else %}danger{% endif %}">
+                                                {{ schedule_performance|title }}
+                                            </span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span>Quality Score</span>
+                                            <span class="badge bg-{% if quality_score >= 80 %}success{% elif quality_score >= 60 %}primary{% elif quality_score >= 40 %}warning{% else %}danger{% endif %}">
+                                                {{ quality_score|default:0 }}/100
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted mb-3">Risk Factors</h6>
+                                        <div class="risk-indicator mb-2">
+                                            <div class="d-flex justify-content-between">
+                                                <span>Budget Risk</span>
+                                                <div class="progress" style="width: 60px; height: 8px;">
+                                                    <div class="progress-bar bg-{% if budget_risk == 'low' %}success{% elif budget_risk == 'medium' %}warning{% else %}danger{% endif %}" 
+                                                         style="width: {% if budget_risk == 'low' %}25{% elif budget_risk == 'medium' %}50{% else %}75{% endif %}%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="risk-indicator mb-2">
+                                            <div class="d-flex justify-content-between">
+                                                <span>Schedule Risk</span>
+                                                <div class="progress" style="width: 60px; height: 8px;">
+                                                    <div class="progress-bar bg-{% if schedule_risk == 'low' %}success{% elif schedule_risk == 'medium' %}warning{% else %}danger{% endif %}" 
+                                                         style="width: {% if schedule_risk == 'low' %}25{% elif schedule_risk == 'medium' %}50{% else %}75{% endif %}%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="risk-indicator mb-2">
+                                            <div class="d-flex justify-content-between">
+                                                <span>Resource Risk</span>
+                                                <div class="progress" style="width: 60px; height: 8px;">
+                                                    <div class="progress-bar bg-{% if resource_risk == 'low' %}success{% elif resource_risk == 'medium' %}warning{% else %}danger{% endif %}" 
+                                                         style="width: {% if resource_risk == 'low' %}25{% elif resource_risk == 'medium' %}50{% else %}75{% endif %}%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <i class="bi bi-trophy me-2 text-warning"></i>
+                                    Project Milestones
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="milestone-item mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="milestone-icon bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 30px; height: 30px;">
+                                            <i class="bi bi-check"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">Project Initiated</h6>
+                                            <small class="text-muted">{{ project.created_at|date:"M d, Y" }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="milestone-item mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="milestone-icon bg-{% if project.completion_percentage >= 25 %}success{% else %}secondary{% endif %} text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 30px; height: 30px;">
+                                            <i class="bi bi-{% if project.completion_percentage >= 25 %}check{% else %}clock{% endif %}"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">25% Complete</h6>
+                                            <small class="text-muted">Foundation Phase</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="milestone-item mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="milestone-icon bg-{% if project.completion_percentage >= 50 %}success{% else %}secondary{% endif %} text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 30px; height: 30px;">
+                                            <i class="bi bi-{% if project.completion_percentage >= 50 %}check{% else %}clock{% endif %}"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">50% Complete</h6>
+                                            <small class="text-muted">Construction Phase</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="milestone-item">
+                                    <div class="d-flex align-items-center">
+                                        <div class="milestone-icon bg-{% if project.completion_percentage >= 100 %}success{% else %}secondary{% endif %} text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 30px; height: 30px;">
+                                            <i class="bi bi-{% if project.completion_percentage >= 100 %}check{% else %}clock{% endif %}"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">100% Complete</h6>
+                                            <small class="text-muted">Project Delivery</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -410,5 +651,84 @@ fetch('{% url "projects:analytics" project.id %}')
             }
         });
     });
+
+    // Budget Utilization Chart
+    const budgetUtilizationCtx = document.getElementById('budgetUtilizationChart');
+    if (budgetUtilizationCtx) {
+        const usedBudget = {{ project.actual_cost|default:0 }};
+        const totalBudget = {{ project.estimated_budget|default:1 }};
+        const remainingBudget = totalBudget - usedBudget;
+        
+        new Chart(budgetUtilizationCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Used Budget', 'Remaining Budget'],
+                datasets: [{
+                    data: [usedBudget, remainingBudget],
+                    backgroundColor: [
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(16, 185, 129, 0.8)'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const value = context.parsed;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return context.label + ': ₹' + value.toLocaleString() + ' (' + percentage + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Monthly Progress Chart
+    const monthlyProgressCtx = document.getElementById('monthlyProgressChart');
+    if (monthlyProgressCtx) {
+        new Chart(monthlyProgressCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Progress %',
+                    data: [10, 25, 35, 45, 60, {{ project.completion_percentage|default:0 }}],
+                    backgroundColor: 'rgba(124, 58, 237, 0.6)',
+                    borderColor: 'rgba(124, 58, 237, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'Progress %'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
 </script>
 {% endblock %}
