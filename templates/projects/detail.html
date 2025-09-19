@@ -9,8 +9,6 @@
 /* Tighten the analysis card spacing and force canvas to use full container */
 .project-analytics .card-body{padding:12px 12px 8px 12px}
 .project-analytics .chart-container{height:180px;margin:0}
-#budgetChart{display:block !important;width:100% !important;height:100% !important}
-#progressSpark{display:block !important;width:100% !important}
 .projects-analytics-row > [class*="col-"]{align-self:flex-start}
 .projects-analytics-row{align-items:flex-start !important}
 .projects-analytics-row .card{height:auto}
@@ -150,7 +148,7 @@
 <!-- Charts and Analytics -->
 <div class="row mb-4 projects-analytics-row" style="align-items:flex-start;">
     <!-- Project Timeline -->
-    <div class="col-md-6 mb-3 project-analytics">
+    <div class="col-md-12 mb-3 project-analytics">
         <div class="card">
             <div class="card-header bg-white">
                 <h5 class="mb-0">
@@ -181,26 +179,6 @@
         </div>
     </div>
     
-    <!-- Budget vs Actual Chart -->
-    <div class="col-md-6 mb-3 project-analytics">
-        <div class="card">
-            <div class="card-header bg-white">
-                <h5 class="mb-0">
-                    <i class="fas fa-chart-bar me-2 text-primary"></i>
-                    Progress Trend & Budget Analysis
-                </h5>
-            </div>
-            <div class="card-body p-3" style="padding-bottom:8px !important;">
-                <div class="chart-container" style="height:auto;min-height:260px;">
-                    <canvas id="budgetChart"></canvas>
-                </div>
-                <div class="mt-1 spark-wrap" style="margin-top:6px !important;">
-                    <small class="text-muted">Last 14 days progress</small>
-                    <canvas id="progressSpark" height="40"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <!-- Project Analytics Dashboard -->
@@ -550,74 +528,6 @@
 
 {% block extra_js %}
 <script>
-// Budget vs Actual Chart
-const ctx1 = document.getElementById('budgetChart').getContext('2d');
-new Chart(ctx1, {
-    type: 'bar',
-    data: {
-        labels: ['Budget', 'Actual Spent', 'Remaining'],
-        datasets: [{
-            data: [
-                {{ project.estimated_budget }},
-                {{ project.actual_cost }},
-                {{ project.estimated_budget }} - {{ project.actual_cost }}
-            ],
-            backgroundColor: [
-                '#2563eb',
-                '{% if project.actual_cost > project.estimated_budget %}#ef4444{% else %}#10b981{% endif %}',
-                '#f59e0b'
-            ]
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        layout: { padding: 0 },
-        plugins: {
-            legend: {
-                display: false
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                grid: { color: 'rgba(107, 114, 128, 0.1)', drawBorder: false },
-                ticks: {
-                    callback: function(value) {
-                        return '₹' + value.toLocaleString();
-                    }
-                }
-            }
-        }
-    }
-});
-
-// Progress sparkline
-const sparkCtx = document.getElementById('progressSpark').getContext('2d');
-new Chart(sparkCtx, {
-    type: 'line',
-    data: {
-        labels: Array.from({length: {{ progress_spark|length|default:0 }}}, (_, i) => i+1),
-        datasets: [{
-            data: {{ progress_spark|default:'[]' }},
-            borderColor: '#2563eb',
-            backgroundColor: 'rgba(37,99,235,0.15)',
-            fill: true,
-            tension: 0.3,
-            pointRadius: 0
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        layout: { padding: 0 },
-        plugins: { legend: { display: false } },
-        scales: {
-            x: { display: false },
-            y: { display: false }
-        }
-    }
-});
 
 // Expense Categories Chart
 fetch('{% url "projects:analytics" project.id %}')
