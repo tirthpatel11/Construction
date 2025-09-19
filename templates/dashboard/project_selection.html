@@ -146,20 +146,7 @@
         <!-- Project Analytics -->
         {% if projects %}
         <div class="row mt-4">
-            <div class="col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="bi bi-pie-chart me-2 text-info"></i>
-                            Project Status Distribution
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="statusChart" width="400" height="200"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 mb-4">
+            <div class="col-md-12 mb-4">
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0">
@@ -419,44 +406,6 @@ canvas {
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Project Status Distribution Chart
-    const statusCtx = document.getElementById('statusChart');
-    if (statusCtx) {
-        const statusData = {};
-        {% for project in projects %}
-        const status = '{{ project.get_status_display }}';
-        statusData[status] = (statusData[status] || 0) + 1;
-        {% endfor %}
-        
-        const statusLabels = Object.keys(statusData);
-        const statusValues = Object.values(statusData);
-        
-        new Chart(statusCtx, {
-            type: 'doughnut',
-            data: {
-                labels: statusLabels,
-                datasets: [{
-                    data: statusValues,
-                    backgroundColor: [
-                        '#10b981', // success
-                        '#3b82f6', // primary
-                        '#f59e0b', // warning
-                        '#6b7280'  // secondary
-                    ],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }
-        });
-    }
 
     // Budget vs Progress Chart
     const budgetCtx = document.getElementById('budgetProgressChart');
