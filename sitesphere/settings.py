@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "material_management",
     "accounts",
     "sales",
+    "reports",
 ]
 
 MIDDLEWARE = [

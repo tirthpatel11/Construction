@@ -37,6 +37,7 @@ urlpatterns = [
     path("material-management/", include("material_management.urls")),
     path("accounts/", include("accounts.urls")),
     path("sales/", include("sales.urls")),
+    path("reports/", include("reports.urls")),
 ]
 
 if settings.DEBUG:

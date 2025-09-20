@@ -505,7 +505,7 @@
                                 <a class="nav-link nav-link-sm" href="{% url 'sales:customer_create' %}"><i class="fas fa-user-plus me-2"></i><span class="nav-label">Add Customer</span></a>
                                 </div>
                             </div>
-                            <a class="nav-link" href="#" data-bs-toggle="tooltip" data-bs-placement="right" title="Reports">
+                            <a class="nav-link {% if 'reports' in request.resolver_match.namespace %}active{% endif %}" href="{% url 'reports:dashboard' %}" data-bs-toggle="tooltip" data-bs-placement="right" title="Reports">
                                 <i class="fas fa-chart-bar"></i>
                                 <span class="nav-label">Reports</span>
                             </a>
