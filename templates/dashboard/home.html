@@ -26,12 +26,13 @@
     .stat-card-modern {
         background: linear-gradient(135deg, rgba(124,58,237,0.16) 0%, rgba(147,51,234,0.28) 100%);
         color: #0f172a;
-        border-radius: 20px;
-        padding: 1.25rem;
+        border-radius: 16px;
+        padding: 1rem;
         position: relative;
         overflow: hidden;
         border: 1px solid var(--glass-border);
         backdrop-filter: saturate(140%) blur(10px);
+        height: 100%;
     }
     
     .stat-card-modern::before {
@@ -65,13 +66,19 @@
     
     .chart-container-modern {
         position: relative;
-        height: 350px;
+        height: 300px;
         background: var(--glass-bg);
-        border-radius: 16px;
-        padding: 1.25rem;
+        border-radius: 12px;
+        padding: 1rem;
         border: 1px solid var(--glass-border);
         box-shadow: var(--shadow-soft);
         backdrop-filter: saturate(140%) blur(10px);
+    }
+    
+    @media (max-width: 768px) {
+        .chart-container-modern {
+            height: 250px;
+        }
     }
     
     .metric-card {
@@ -110,7 +117,7 @@
     .activity-item {
         display: flex;
         align-items: center;
-        padding: 0.9rem;
+        padding: 0.75rem;
         border-radius: 12px;
         margin-bottom: 0.5rem;
         background: var(--glass-bg);
@@ -118,6 +125,10 @@
         box-shadow: var(--shadow-soft);
         transition: all 0.3s ease;
         backdrop-filter: saturate(140%) blur(10px);
+    }
+    
+    .activity-item:last-child {
+        margin-bottom: 0;
     }
     
     .activity-item:hover {
@@ -179,9 +190,18 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 0.75rem;
+        padding: 1rem 1rem 0.75rem;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.3);
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .chart-toolbar {
+            flex-direction: column;
+            align-items: flex-start;
+        }
     }
     
     .chart-controls {
@@ -205,20 +225,77 @@
         color: white;
         border-color: var(--primary-color);
     }
+    
+    /* Responsive optimizations */
+    @media (max-width: 992px) {
+        .stat-card-modern {
+            padding: 0.875rem;
+        }
+        
+        .stat-card-modern h2 {
+            font-size: 1.5rem;
+        }
+        
+        .dashboard-widget {
+            margin-bottom: 0;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .stat-card-modern {
+            padding: 0.75rem;
+        }
+        
+        .stat-card-modern h2 {
+            font-size: 1.25rem;
+        }
+        
+        .chart-container-modern {
+            height: 220px;
+            padding: 0.75rem;
+        }
+        
+        .activity-item {
+            padding: 0.625rem;
+        }
+        
+        .activity-icon {
+            width: 35px;
+            height: 35px;
+            font-size: 1rem;
+            margin-right: 0.75rem;
+        }
+    }
+    
+    /* Remove extra margins on last items */
+    .row:last-child .dashboard-widget:last-child {
+        margin-bottom: 0;
+    }
+    
+    /* Compact empty states */
+    .text-center.py-3 {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+    
+    /* Ensure widgets fill available space */
+    .dashboard-widget {
+        min-height: fit-content;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 
 <!-- Welcome Section -->
-<div class="row mb-4">
+<div class="row mb-3">
     <div class="col-12">
         <div class="dashboard-widget">
-            <div class="p-4">
-                <div class="d-flex justify-content-between align-items-center">
+            <div class="p-3">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div>
-                        <h3 class="mb-2">Welcome back, {{ user.first_name|default:user.username }}!</h3>
-                        <p class="text-muted mb-0">Here's what's happening with your construction projects today.</p>
+                        <h3 class="mb-1" style="font-size: 1.25rem;">Welcome back, {{ user.first_name|default:user.username }}!</h3>
+                        <p class="text-muted mb-0 small">Here's what's happening with your construction projects today.</p>
                     </div>
                     <div class="d-flex gap-2">
                         <button class="btn btn-outline-primary btn-sm" onclick="refreshDashboard()">
@@ -235,8 +312,8 @@
 </div>
 
 <!-- Statistics Cards -->
-<div class="row mb-4" id="kpiGrid" data-grid="kpi">
-    <div class="col-lg-3 col-md-6 mb-4">
+<div class="row g-3 mb-3" id="kpiGrid" data-grid="kpi">
+    <div class="col-lg-3 col-md-6">
         <div class="stat-card-modern draggable-widget" draggable="true" data-widget-id="kpi-total-projects">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
@@ -253,7 +330,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-3 col-md-6 mb-4">
+    <div class="col-lg-3 col-md-6">
         <div class="stat-card-modern stat-card-success draggable-widget" draggable="true" data-widget-id="kpi-active-projects">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
@@ -270,7 +347,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-3 col-md-6 mb-4">
+    <div class="col-lg-3 col-md-6">
         <div class="stat-card-modern stat-card-warning draggable-widget" draggable="true" data-widget-id="kpi-total-budget">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
@@ -287,7 +364,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-3 col-md-6 mb-4">
+    <div class="col-lg-3 col-md-6">
         <div class="stat-card-modern stat-card-danger draggable-widget" draggable="true" data-widget-id="kpi-budget-used">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
@@ -307,9 +384,9 @@
 </div>
 
 <!-- Charts Row -->
-<div class="row mb-4" id="widgetsGrid" data-grid="widgets">
+<div class="row g-3 mb-3" id="widgetsGrid" data-grid="widgets">
     <!-- Cash Flow Chart -->
-    <div class="col-lg-8 mb-4">
+    <div class="col-lg-8">
         <div class="dashboard-widget draggable-widget" draggable="true" data-widget-id="w-cash-flow">
             <div class="chart-toolbar">
                 <div>
@@ -332,8 +409,8 @@
     </div>
     
     <!-- Cost Breakdown & Budget Utilization -->
-    <div class="col-lg-4 mb-4">
-        <div class="dashboard-widget draggable-widget" draggable="true" data-widget-id="w-cost-breakdown">
+    <div class="col-lg-4">
+        <div class="dashboard-widget draggable-widget mb-3" draggable="true" data-widget-id="w-cost-breakdown">
             <div class="chart-toolbar">
                 <h5 class="mb-0">
                     <i class="fas fa-chart-pie me-2 text-primary"></i>
@@ -346,9 +423,9 @@
         </div>
         
         <!-- Budget Utilization Gauge -->
-        <div class="dashboard-widget mt-3 draggable-widget" draggable="true" data-widget-id="w-budget-utilization">
+        <div class="dashboard-widget draggable-widget" draggable="true" data-widget-id="w-budget-utilization">
             <div class="p-3">
-                <h6 class="mb-3">
+                <h6 class="mb-2" style="font-size: 0.95rem;">
                     <i class="fas fa-gauge me-2 text-warning"></i>
                     Budget Utilization
                 </h6>
@@ -380,9 +457,9 @@
 </div>
 
 <!-- Project Completion & Resource Utilization -->
-<div class="row mb-4">
+<div class="row g-3 mb-3">
     <!-- Project Completion Progress -->
-    <div class="col-lg-6 mb-4">
+    <div class="col-lg-6">
         <div class="dashboard-widget">
             <div class="chart-toolbar">
                 <h5 class="mb-0">
@@ -391,7 +468,7 @@
                 </h5>
                 <a href="{% url 'projects:list' %}" class="btn btn-outline-primary btn-sm">View All</a>
             </div>
-            <div class="p-3">
+            <div class="p-3" style="max-height: 400px; overflow-y: auto;">
                 {% for project in recent_projects %}
                 <div class="activity-item">
                     <div class="activity-icon {% if project.completion_percentage == 100 %}success{% elif project.completion_percentage > 50 %}primary{% else %}warning{% endif %}">
@@ -418,9 +495,9 @@
                     </div>
                 </div>
                 {% empty %}
-                <div class="text-center py-4">
-                    <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
-                    <p class="text-muted">No projects found</p>
+                <div class="text-center py-3">
+                    <i class="fas fa-folder-open fa-2x text-muted mb-2"></i>
+                    <p class="text-muted mb-2 small">No projects found</p>
                     <a href="{% url 'projects:create' %}" class="btn btn-primary btn-sm">Create First Project</a>
                 </div>
                 {% endfor %}
@@ -429,7 +506,7 @@
     </div>
     
     <!-- Resource Utilization Heatmap -->
-    <div class="col-lg-6 mb-4">
+    <div class="col-lg-6">
         <div class="dashboard-widget">
             <div class="chart-toolbar">
                 <h5 class="mb-0">
@@ -452,9 +529,9 @@
 </div>
 
 <!-- Recent Activity & Upcoming Payments -->
-<div class="row">
+<div class="row g-3">
     <!-- Recent Activity -->
-    <div class="col-lg-6 mb-4">
+    <div class="col-lg-6">
         <div class="dashboard-widget">
             <div class="chart-toolbar">
                 <h5 class="mb-0">
@@ -503,9 +580,9 @@
                 {% endfor %}
                 
                 {% if not recent_projects and not upcoming_payments %}
-                <div class="text-center py-4">
-                    <i class="fas fa-history fa-3x text-muted mb-3"></i>
-                    <p class="text-muted">No recent activity</p>
+                <div class="text-center py-3">
+                    <i class="fas fa-history fa-2x text-muted mb-2"></i>
+                    <p class="text-muted mb-0 small">No recent activity</p>
                 </div>
                 {% endif %}
             </div>
@@ -513,7 +590,7 @@
     </div>
     
     <!-- Upcoming Payments & Quick Stats -->
-    <div class="col-lg-6 mb-4">
+    <div class="col-lg-6">
         <div class="dashboard-widget">
             <div class="chart-toolbar">
                 <h5 class="mb-0">
@@ -522,7 +599,7 @@
                 </h5>
                 <a href="#" class="btn btn-outline-primary btn-sm">View All</a>
             </div>
-            <div class="p-3">
+            <div class="p-3" style="max-height: 300px; overflow-y: auto;">
                 {% for payment in upcoming_payments %}
                 <div class="activity-item">
                     <div class="activity-icon {% if payment.status == 'overdue' %}danger{% elif payment.status == 'pending' %}warning{% else %}success{% endif %}">
@@ -540,9 +617,9 @@
                     </div>
                 </div>
                 {% empty %}
-                <div class="text-center py-4">
-                    <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-                    <p class="text-muted">No pending payments</p>
+                <div class="text-center py-3">
+                    <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                    <p class="text-muted mb-0 small">No pending payments</p>
                 </div>
                 {% endfor %}
             </div>
@@ -587,12 +664,12 @@
 </div>
 
 <!-- Quick Actions -->
-<div class="row mt-4">
+<div class="row mt-3">
     <div class="col-12">
         <div class="dashboard-widget">
-            <div class="p-4 text-center">
-                <h5 class="mb-4">Quick Actions</h5>
-                <div class="row g-3">
+            <div class="p-3 text-center">
+                <h5 class="mb-3" style="font-size: 1.1rem;">Quick Actions</h5>
+                <div class="row g-2">
                     <div class="col-lg-3 col-md-6">
                         <a href="{% url 'projects:create' %}" class="btn btn-primary w-100 py-3">
                             <i class="fas fa-plus fa-2x mb-2 d-block"></i>
