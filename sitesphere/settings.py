@@ -27,15 +27,29 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY', "django-insecure-joie#@+ngtfd(xgf-r*d4zd-p@-r+pvz2=p+=3vk-1z29^11dj")
 
-DEBUG = os.getenv('DEBUG', 'false').lower() == 'true'
+# Detect if we're in development (no DATABASE_URL means local development)
+is_development = not os.getenv('DATABASE_URL') or os.getenv('DATABASE_URL', '').strip() == ''
+
+# Set DEBUG=True by default for local development
+DEBUG = os.getenv('DEBUG', 'true' if is_development else 'false').lower() == 'true'
 
 # ALLOWED_HOSTS configuration
 allowed_hosts_str = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver')
 ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(',') if host.strip()]
 
-# In development, allow all hosts if DEBUG is True
-if DEBUG:
-    ALLOWED_HOSTS = ['*']
+# In development, add comprehensive localhost variants
+if DEBUG or is_development:
+    # Add common localhost variants for development
+    localhost_variants = [
+        'localhost', 
+        '127.0.0.1', 
+        '0.0.0.0', 
+        'testserver', 
+        '[::1]',
+    ]
+    for host in localhost_variants:
+        if host not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(host)
 
 
 # Application definition
@@ -65,7 +79,7 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
-    "django.middleware.common.CommonMiddleware",
+    "sitesphere.middleware.FlexibleCommonMiddleware",  # Custom CommonMiddleware that allows any host in DEBUG
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
