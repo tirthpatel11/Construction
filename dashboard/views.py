@@ -1,6 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.models import User
 from django.http import JsonResponse
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 from projects.models import Project, Partner, ProjectExpense, ProjectPayment
 from django.db.models import Sum, Count, Q, Avg
 from django.utils import timezone
@@ -218,13 +223,67 @@ def analytics_data(request):
 
 @login_required
 def settings_view(request):
-    """Simple settings page storing preferences in session."""
+    """Settings page for appearance and account management."""
     if request.method == 'POST':
-        theme = request.POST.get('theme', 'light')
-        currency = request.POST.get('currency', 'INR')
-        request.session['ui_theme'] = theme
-        request.session['currency'] = currency
+        form_type = request.POST.get('form_type', 'appearance')
+        
+        if form_type == 'appearance':
+            # Handle appearance settings
+            theme = request.POST.get('theme', 'light')
+            currency = request.POST.get('currency', 'INR')
+            request.session['ui_theme'] = theme
+            request.session['currency'] = currency
+            request.session.modified = True  # Ensure session is saved
+            messages.success(request, f'Appearance settings saved successfully! Theme: {theme}, Currency: {currency}')
+            
+        elif form_type == 'account':
+            # Handle account changes
+            user = request.user
+            user_changed = False
+            
+            # Update email if provided
+            new_email = request.POST.get('email', '').strip()
+            if new_email and new_email != user.email:
+                # Validate email format
+                try:
+                    validate_email(new_email)
+                    # Check if email is already taken
+                    if User.objects.filter(email=new_email).exclude(pk=user.pk).exists():
+                        messages.error(request, 'This email is already registered. Please use a different email.')
+                    else:
+                        user.email = new_email
+                        user_changed = True
+                        messages.success(request, 'Email updated successfully!')
+                except ValidationError:
+                    messages.error(request, 'Please enter a valid email address.')
+            
+            # Update password if provided
+            current_password = request.POST.get('current_password', '')
+            new_password = request.POST.get('new_password', '')
+            confirm_password = request.POST.get('confirm_password', '')
+            
+            if new_password:
+                if not current_password:
+                    messages.error(request, 'Please enter your current password to change it.')
+                elif not user.check_password(current_password):
+                    messages.error(request, 'Current password is incorrect.')
+                elif new_password != confirm_password:
+                    messages.error(request, 'New password and confirm password do not match.')
+                elif len(new_password) < 8:
+                    messages.error(request, 'Password must be at least 8 characters long.')
+                else:
+                    user.set_password(new_password)
+                    user.save()
+                    update_session_auth_hash(request, user)  # Keep user logged in
+                    messages.success(request, 'Password changed successfully!')
+                    user_changed = False  # Already saved above
+            
+            # Save user changes if email was updated
+            if user_changed:
+                user.save()
+        
         return redirect('dashboard:settings')
+    
     context = {
         'theme': request.session.get('ui_theme', 'light'),
         'currency': request.session.get('currency', 'INR'),

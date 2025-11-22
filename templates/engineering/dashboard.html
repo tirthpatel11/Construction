@@ -24,13 +24,19 @@
     
     .stat-card-modern {
         background: linear-gradient(135deg, rgba(124,58,237,0.16) 0%, rgba(147,51,234,0.28) 100%);
-        color: #0f172a;
+        color: #ffffff;
         border-radius: 20px;
         padding: 1.25rem;
         position: relative;
         overflow: hidden;
         border: 1px solid var(--glass-border);
         backdrop-filter: saturate(140%) blur(10px);
+    }
+
+    .stat-card-modern h2,
+    .stat-card-modern p,
+    .stat-card-modern small {
+        color: #ffffff;
     }
     
     .stat-card-modern::before {
@@ -193,7 +199,7 @@
             <div class="p-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h3 class="mb-2">Engineering Overview 👷‍♂️</h3>
+                        <h3 class="mb-2">Engineering Overview</h3>
                         <p class="text-muted mb-0">Track project estimations, budgets, schedules, and cost controls.</p>
                     </div>
                     <div class="d-flex gap-2">

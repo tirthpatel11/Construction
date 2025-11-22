@@ -1,42 +1,376 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Settings - SiteSphere{% endblock %}
+
 {% block page_title %}Settings{% endblock %}
+
+{% block extra_css %}
+<style>
+    .settings-section {
+        background: var(--glass-bg);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(99,102,241,0.15);
+        box-shadow: 
+            0 8px 32px rgba(0,0,0,0.08),
+            0 2px 8px rgba(99,102,241,0.1);
+    }
+    
+    .settings-section h4 {
+        color: var(--text-primary);
+        margin-bottom: 1.5rem;
+        font-weight: 500;
+        border-bottom: 2px solid rgba(99,102,241,0.2);
+        padding-bottom: 0.75rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+        color: var(--text-secondary);
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .form-select, .form-control {
+        border: 2px solid rgba(99,102,241,0.2);
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+        background: rgba(255,255,255,0.9);
+    }
+    
+    .form-select:focus, .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(99,102,241,0.15);
+        outline: none;
+    }
+    
+    .form-control:disabled {
+        background: rgba(0,0,0,0.05);
+        cursor: not-allowed;
+    }
+    
+    .theme-preview {
+        display: flex;
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
+    
+    .theme-option {
+        flex: 1;
+        padding: 2.5rem 1.5rem;
+        border-radius: 20px;
+        border: 3px solid transparent;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-align: center;
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .theme-option::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(99,102,241,0.05);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .theme-option:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+    
+    .theme-option:hover::before {
+        opacity: 1;
+    }
+    
+    .theme-option.active {
+        border-color: var(--primary-color);
+        background: rgba(99,102,241,0.1);
+        box-shadow: 0 8px 24px rgba(99,102,241,0.25);
+    }
+    
+    .theme-option.active::after {
+        content: '✓';
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 28px;
+        height: 28px;
+        background: var(--gradient-primary);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 16px;
+    }
+    
+    .theme-light {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #ffffff 100%);
+        color: var(--text-primary);
+        border: 3px solid rgba(99,102,241,0.2);
+    }
+    
+    .theme-dark {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);
+        color: #e2e8f0;
+        border: 3px solid rgba(99,102,241,0.3);
+    }
+    
+    .theme-option i {
+        margin-bottom: 1rem;
+        opacity: 0.9;
+        transition: all 0.3s ease;
+    }
+    
+    .theme-light i {
+        color: var(--text-primary);
+        opacity: 1;
+    }
+    
+    .theme-dark i {
+        color: #e2e8f0 !important;
+        opacity: 1;
+    }
+    
+    .theme-option.active i {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+    
+    .save-btn {
+        background: var(--gradient-primary);
+        border: none;
+        border-radius: 12px;
+        padding: 12px 32px;
+        font-weight: 500;
+        color: white;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 16px rgba(99,102,241,0.3);
+    }
+    
+    .save-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(99,102,241,0.4);
+    }
+    
+    .password-toggle {
+        position: relative;
+    }
+    
+    .password-toggle-btn {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 0.5rem;
+    }
+    
+    .password-toggle-btn:hover {
+        color: var(--primary-color);
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="row">
-  <div class="col-md-8">
-    <div class="card">
-      <div class="card-header bg-white">
-        <h5 class="mb-0"><i class="fas fa-cog me-2 text-primary"></i>Preferences</h5>
-      </div>
-      <div class="card-body">
-        <form method="post">
-          {% csrf_token %}
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Theme</label>
-            <select class="form-select" name="theme">
-              <option value="light" {% if theme == 'light' %}selected{% endif %}>Light</option>
-              <option value="dark" {% if theme == 'dark' %}selected{% endif %}>Dark</option>
-            </select>
-          </div>
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Currency</label>
-            <select class="form-select" name="currency">
-              <option value="INR" {% if currency == 'INR' %}selected{% endif %}>Indian Rupee (₹)</option>
-              <option value="USD" {% if currency == 'USD' %}selected{% endif %}>US Dollar ($)</option>
-            </select>
-          </div>
-          <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Save</button>
-        </form>
-      </div>
+    <div class="col-lg-8 mx-auto">
+        <!-- Appearance Settings -->
+        <div class="settings-section">
+            <h4>
+                <i class="fas fa-palette me-2"></i>
+                Appearance Settings
+            </h4>
+            <form method="post" id="appearanceForm">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="appearance">
+                
+                <div class="form-group">
+                    <label>Choose Theme</label>
+                    <input type="hidden" name="theme" id="theme" value="{{ theme }}">
+                    <div class="theme-preview">
+                        <div class="theme-option theme-light {% if theme == 'light' %}active{% endif %}" onclick="selectTheme('light')">
+                            <i class="fas fa-sun fa-3x mb-3"></i>
+                            <div class="h5 mb-2">Light Theme</div>
+                            <small class="text-muted">Clean and bright interface</small>
+                        </div>
+                        <div class="theme-option theme-dark {% if theme == 'dark' %}active{% endif %}" onclick="selectTheme('dark')">
+                            <i class="fas fa-moon fa-3x mb-3"></i>
+                            <div class="h5 mb-2">Dark Theme</div>
+                            <small class="text-muted">Easy on the eyes</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="currency">Currency</label>
+                    <select name="currency" id="currency" class="form-select">
+                        <option value="INR" {% if currency == 'INR' %}selected{% endif %}>₹ Indian Rupee (INR)</option>
+                        <option value="USD" {% if currency == 'USD' %}selected{% endif %}>$ US Dollar (USD)</option>
+                        <option value="EUR" {% if currency == 'EUR' %}selected{% endif %}>€ Euro (EUR)</option>
+                        <option value="GBP" {% if currency == 'GBP' %}selected{% endif %}>£ British Pound (GBP)</option>
+                    </select>
+                </div>
+                
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn save-btn">
+                        <i class="fas fa-save me-2"></i>
+                        Save Appearance Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Account Information -->
+        <div class="settings-section">
+            <h4>
+                <i class="fas fa-user me-2"></i>
+                Account Information
+            </h4>
+            <form method="post" id="accountForm">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="account">
+                
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" class="form-control" value="{{ user.username }}" disabled>
+                    <small class="text-muted">Username cannot be changed</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" id="email" class="form-control" value="{{ user.email|default:'' }}" required>
+                    <small class="text-muted">You can change your email address here</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="current_password">Current Password</label>
+                    <div class="password-toggle">
+                        <input type="password" name="current_password" id="current_password" class="form-control" placeholder="Enter current password to change password">
+                        <button type="button" class="password-toggle-btn" onclick="togglePassword('current_password')">
+                            <i class="fas fa-eye" id="current_password_icon"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="new_password">New Password</label>
+                    <div class="password-toggle">
+                        <input type="password" name="new_password" id="new_password" class="form-control" placeholder="Enter new password">
+                        <button type="button" class="password-toggle-btn" onclick="togglePassword('new_password')">
+                            <i class="fas fa-eye" id="new_password_icon"></i>
+                        </button>
+                    </div>
+                    <small class="text-muted">Leave blank if you don't want to change password</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm_password">Confirm New Password</label>
+                    <div class="password-toggle">
+                        <input type="password" name="confirm_password" id="confirm_password" class="form-control" placeholder="Confirm new password">
+                        <button type="button" class="password-toggle-btn" onclick="togglePassword('confirm_password')">
+                            <i class="fas fa-eye" id="confirm_password_icon"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" class="form-control" value="{{ user.get_full_name|default:'Not set' }}" disabled>
+                </div>
+                
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn save-btn">
+                        <i class="fas fa-save me-2"></i>
+                        Save Account Changes
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-  </div>
 </div>
 {% endblock %}
 
-
-
-
-
+{% block extra_js %}
+<script>
+    function selectTheme(theme) {
+        // Update hidden input
+        document.getElementById('theme').value = theme;
+        
+        // Update active state
+        document.querySelectorAll('.theme-option').forEach(option => {
+            option.classList.remove('active');
+        });
+        
+        if (theme === 'light') {
+            document.querySelector('.theme-light').classList.add('active');
+        } else {
+            document.querySelector('.theme-dark').classList.add('active');
+        }
+    }
+    
+    // Ensure currency is always submitted with the form
+    document.getElementById('appearanceForm').addEventListener('submit', function(e) {
+        const currencySelect = document.getElementById('currency');
+        if (!currencySelect.value) {
+            currencySelect.value = 'INR'; // Default fallback
+        }
+        console.log('Submitting currency:', currencySelect.value);
+    });
+    
+    function togglePassword(fieldId) {
+        const field = document.getElementById(fieldId);
+        const icon = document.getElementById(fieldId + '_icon');
+        if (field.type === 'password') {
+            field.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            field.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+    
+    // Validate password match on form submit
+    document.getElementById('accountForm').addEventListener('submit', function(e) {
+        const newPassword = document.getElementById('new_password').value;
+        const confirmPassword = document.getElementById('confirm_password').value;
+        
+        if (newPassword && newPassword !== confirmPassword) {
+            e.preventDefault();
+            alert('New password and confirm password do not match!');
+            return false;
+        }
+        
+        if (newPassword && newPassword.length < 8) {
+            e.preventDefault();
+            alert('Password must be at least 8 characters long!');
+            return false;
+        }
+    });
+</script>
+{% endblock %}
 

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load currency_tags %}
 
 {% block title %}Dashboard - SiteSphere{% endblock %}
 
@@ -216,7 +217,7 @@
             <div class="p-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h3 class="mb-2">Welcome back, {{ user.first_name|default:user.username }}! 👋</h3>
+                        <h3 class="mb-2">Welcome back, {{ user.first_name|default:user.username }}!</h3>
                         <p class="text-muted mb-0">Here's what's happening with your construction projects today.</p>
                     </div>
                     <div class="d-flex gap-2">
@@ -273,10 +274,10 @@
         <div class="stat-card-modern stat-card-warning draggable-widget" draggable="true" data-widget-id="kpi-total-budget">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
-                    <h2 class="mb-1">₹{{ total_budget|floatformat:0 }}</h2>
+                    <h2 class="mb-1">{{ currency_symbol|default:"₹" }}{{ total_budget|floatformat:0 }}</h2>
                     <p class="mb-0 opacity-75">Total Budget</p>
                     <small class="opacity-75">
-                        <i class="fas fa-indian-rupee-sign me-1"></i>
+                        <span class="me-1">{{ currency_symbol|default:"₹" }}</span>
                         Across all projects
                     </small>
                 </div>
@@ -294,7 +295,7 @@
                     <p class="mb-0 opacity-75">Budget Used</p>
                     <small class="opacity-75">
                         <i class="fas fa-chart-pie me-1"></i>
-                        ₹{{ total_spent|floatformat:0 }} spent
+                        {{ currency_symbol }}{{ total_spent|floatformat:0 }} spent
                     </small>
                 </div>
                 <div class="fs-1 opacity-25">
@@ -370,7 +371,7 @@
                     </div>
                     <div class="d-flex justify-content-between mt-1">
                         <small class="text-muted">Remaining</small>
-                        <small class="text-muted">₹{{ total_budget|floatformat:0|default:0 }}</small>
+                        <small class="text-muted">{{ currency_symbol|default:"₹" }}{{ total_budget|floatformat:0|default:0 }}</small>
                     </div>
                 </div>
             </div>
@@ -412,7 +413,7 @@
                         </div>
                         <div class="d-flex justify-content-between mt-1">
                             <small class="text-muted">{{ project.get_status_display }}</small>
-                            <small class="text-muted">₹{{ project.estimated_budget|floatformat:0|default:0 }}</small>
+                            <small class="text-muted">{{ currency_symbol }}{{ project.estimated_budget|floatformat:0|default:0 }}</small>
                         </div>
                     </div>
                 </div>
@@ -494,7 +495,7 @@
                         <h6 class="mb-1">{{ payment.description }}</h6>
                         <p class="text-muted mb-1 small">{{ payment.project.name }}</p>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="fw-bold text-success">₹{{ payment.amount }}</span>
+                            <span class="fw-bold text-success">{{ currency_symbol }}{{ payment.amount }}</span>
                             <small class="text-muted">Due: {{ payment.due_date|date:"M d" }}</small>
                         </div>
                     </div>
@@ -532,7 +533,7 @@
                         <p class="text-muted mb-1 small">{{ payment.project.name }}</p>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="fw-bold text-{% if payment.status == 'overdue' %}danger{% elif payment.status == 'pending' %}warning{% else %}success{% endif %}">
-                                ₹{{ payment.amount }}
+                                {{ currency_symbol }}{{ payment.amount }}
                             </span>
                             <small class="text-muted">Due: {{ payment.due_date|date:"M d, Y" }}</small>
                         </div>
@@ -744,7 +745,7 @@ function initializeCashFlowChart() {
                     displayColors: true,
                     callbacks: {
                         label: function(context) {
-                            return context.dataset.label + ': ₹' + context.parsed.y.toLocaleString();
+                            return context.dataset.label + ': ' + window.CURRENCY_SYMBOL + context.parsed.y.toLocaleString();
                         }
                     }
                 }
@@ -775,7 +776,7 @@ function initializeCashFlowChart() {
                         },
                         color: '#6b7280',
                         callback: function(value) {
-                            return '₹' + value.toLocaleString();
+                            return window.CURRENCY_SYMBOL + value.toLocaleString();
                         }
                     }
                 }
@@ -1334,9 +1335,17 @@ function setupNotificationsPanel() {
 // Animate counters on page load
 function animateCounters() {
     const counters = document.querySelectorAll('.stat-card-modern h2');
+    const currencySymbol = window.CURRENCY_SYMBOL || '₹';
+    
     counters.forEach(counter => {
-        const numericText = counter.textContent.replace(/[^0-9.-]/g, '');
-        const target = parseInt(numericText || '0');
+        // Extract currency symbol if present
+        const originalText = counter.textContent.trim();
+        const hasCurrency = /^[₹$€£]/.test(originalText);
+        const symbol = hasCurrency ? originalText.charAt(0) : currencySymbol;
+        
+        // Extract numeric value
+        const numericText = originalText.replace(/[^0-9.-]/g, '');
+        const target = parseFloat(numericText || '0');
         const duration = 2000;
         const increment = target / (duration / 16);
         let current = 0;
@@ -1347,11 +1356,8 @@ function animateCounters() {
                 current = target;
                 clearInterval(timer);
             }
-            if (counter.textContent.trim().startsWith('₹')) {
-                counter.textContent = '₹' + Math.floor(current).toLocaleString();
-            } else {
-                counter.textContent = Math.floor(current).toLocaleString();
-            }
+            // Use the detected or default currency symbol
+            counter.textContent = symbol + Math.floor(current).toLocaleString();
         }, 16);
     });
 }
