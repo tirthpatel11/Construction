@@ -27,29 +27,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY', "django-insecure-joie#@+ngtfd(xgf-r*d4zd-p@-r+pvz2=p+=3vk-1z29^11dj")
 
-# Detect if we're in development (no DATABASE_URL means local development)
-is_development = not os.getenv('DATABASE_URL') or os.getenv('DATABASE_URL', '').strip() == ''
+DEBUG = os.getenv('DEBUG', 'false').lower() == 'true'
 
-# Set DEBUG=True by default for local development
-DEBUG = os.getenv('DEBUG', 'true' if is_development else 'false').lower() == 'true'
-
-# ALLOWED_HOSTS configuration
-allowed_hosts_str = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver')
-ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(',') if host.strip()]
-
-# In development, add comprehensive localhost variants
-if DEBUG or is_development:
-    # Add common localhost variants for development
-    localhost_variants = [
-        'localhost', 
-        '127.0.0.1', 
-        '0.0.0.0', 
-        'testserver', 
-        '[::1]',
-    ]
-    for host in localhost_variants:
-        if host not in ALLOWED_HOSTS:
-            ALLOWED_HOSTS.append(host)
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver').split(',')
 
 
 # Application definition
@@ -79,7 +59,7 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
-    "sitesphere.middleware.FlexibleCommonMiddleware",  # Custom CommonMiddleware that allows any host in DEBUG
+    "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -110,40 +90,12 @@ WSGI_APPLICATION = "sitesphere.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASE_URL = os.getenv("DATABASE_URL", "")
-
-if DATABASE_URL and DATABASE_URL.strip():
-    # Use PostgreSQL if DATABASE_URL is provided and not empty
-    try:
-        db_config = dj_database_url.config(
-            default=DATABASE_URL,
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
-        # Validate that we got a valid database config
-        if db_config and 'ENGINE' in db_config:
-            DATABASES = {"default": db_config}
-        else:
-            raise ValueError("Invalid database configuration")
-    except Exception as e:
-        # If database configuration fails, log and fall back to SQLite
-        import sys
-        print(f"Warning: Could not configure PostgreSQL database: {e}", file=sys.stderr)
-        print("Falling back to SQLite database", file=sys.stderr)
-        DATABASES = {
-            "default": {
-                "ENGINE": "django.db.backends.sqlite3",
-                "NAME": BASE_DIR / "db.sqlite3",
-            }
-        }
-else:
-    # Fallback to SQLite for local development
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
+DATABASES = {
+    "default": dj_database_url.config(
+        default=os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
+        conn_max_age=600,
+    )
+}
 
 
 # Password validation
@@ -191,18 +143,6 @@ STORAGES = {
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
-# CSRF Configuration
-CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if os.getenv('CSRF_TRUSTED_ORIGINS') else []
-CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in CSRF_TRUSTED_ORIGINS if origin.strip()]
-# Add common localhost origins for development
-if DEBUG:
-    CSRF_TRUSTED_ORIGINS.extend([
-        'http://localhost:8000',
-        'http://127.0.0.1:8000',
-        'http://localhost:3000',
-        'http://127.0.0.1:3000',
-    ])
-
 # CORS
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
