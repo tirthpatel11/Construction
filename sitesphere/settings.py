@@ -90,12 +90,40 @@ WSGI_APPLICATION = "sitesphere.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    "default": dj_database_url.config(
-        default=os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
-        conn_max_age=600,
-    )
-}
+DATABASE_URL = os.getenv("DATABASE_URL", "")
+
+if DATABASE_URL and DATABASE_URL.strip():
+    # Use PostgreSQL if DATABASE_URL is provided and not empty
+    try:
+        db_config = dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+        # Validate that we got a valid database config
+        if db_config and 'ENGINE' in db_config:
+            DATABASES = {"default": db_config}
+        else:
+            raise ValueError("Invalid database configuration")
+    except Exception as e:
+        # If database configuration fails, log and fall back to SQLite
+        import sys
+        print(f"Warning: Could not configure PostgreSQL database: {e}", file=sys.stderr)
+        print("Falling back to SQLite database", file=sys.stderr)
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": BASE_DIR / "db.sqlite3",
+            }
+        }
+else:
+    # Fallback to SQLite for local development
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 # Password validation

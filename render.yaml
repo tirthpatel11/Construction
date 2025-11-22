@@ -1,3 +1,7 @@
+databases:
+  - name: erp-db
+    plan: free
+
 services:
   - type: web
     name: construction-erp
@@ -21,7 +25,3 @@ services:
         fromDatabase:
           name: erp-db
           property: connectionString
-
-databases:
-  - name: erp-db
-    plan: free
